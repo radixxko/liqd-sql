@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - "node"
+  - "9"
+  - "8"
+services:
+  - mysql
+before_install:
+  - mysql -e 'CREATE DATABASE test;'
+install: true
+script:
+  - npm tests

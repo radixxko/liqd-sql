@@ -20,5 +20,7 @@
     "sql",
     "connector"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "mysql": "^2.15.0"
+  }
 }
