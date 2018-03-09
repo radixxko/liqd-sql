@@ -7,6 +7,5 @@ services:
   - mysql
 before_install:
   - mysql -e 'CREATE DATABASE test;'
-install: true
 script:
   - npm test
