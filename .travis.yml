@@ -9,4 +9,4 @@ before_install:
   - mysql -e 'CREATE DATABASE test;'
 install: true
 script:
-  - npm tests
+  - npm test
