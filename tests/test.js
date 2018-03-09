@@ -40,7 +40,7 @@ fs.readdir( __dirname + '/tests', async( err, files ) =>
 
     for( let i = 0; i < tests.length; ++i )
     {
-      if( tests[i].expects === results[i] )
+      if( JSON.stringify(tests[i].expects) === JSON.stringify(results[i]) )
       {
         console.log( '\x1b[42m\x1b[30m OK  ✓ \x1b[0m \x1b[32mTest "' + tests[i].name + '" successful\x1b[0m' );
 
