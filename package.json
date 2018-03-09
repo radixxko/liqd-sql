@@ -1,0 +1,24 @@
+{
+  "name": "liqd-sql",
+  "description": "Node.JS SQL connector for MySQL, SQL Server and Oracle Databases",
+  "version": "1.0.0",
+  "author": "radixxko",
+  "license": "MIT",
+  "main": "./lib/sql.js",
+  "files": [
+    "./lib/"
+  ],
+  "scripts": {
+    "test": "node tests/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/radixxko/liqd-sql.git"
+  },
+  "keywords": [
+    "liqd",
+    "sql",
+    "connector"
+  ],
+  "dependencies": {}
+}
