@@ -15,10 +15,10 @@ module.exports.test = ( Logger ) =>
 {
   return new Promise( async ( resolve, reject ) =>
   {
-    let test = await SQL('').super_query( 'CREATE TABLE IF NOT EXISTS users ( id bigint unsigned NOT NULL AUTO_INCREMENT, name varchar(255) NOT NULL, PRIMARY KEY (id) )' );
+		await SQL('DROP TABLE IF EXISTS users').execute();
+		await SQL('CREATE TABLE IF NOT EXISTS users ( id bigint unsigned NOT NULL AUTO_INCREMENT, name varchar(255) NOT NULL, PRIMARY KEY (id) )').execute( );
 
-  //  Logger.log( test );
-    let insert = await SQL( 'users' ).insert( { name: 'john' } );
+  	let insert = await SQL( 'users' ).insert( { name: 'john' } );
 
     Logger.log( 'Insert', insert );
 
