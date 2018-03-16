@@ -9,7 +9,8 @@
     "./lib/"
   ],
   "scripts": {
-    "test": "node tests/test.js"
+    "test": "nyc mocha",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,12 @@
     "connector"
   ],
   "dependencies": {
-    "liqd-timed-promise": "^1.1.1",
+    "liqd-timed-promise": "^1.2.0",
     "mysql": "^2.15.0"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.0",
+    "mocha": "^5.0.4",
+    "nyc": "^11.6.0"
   }
 }

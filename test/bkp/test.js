@@ -19,7 +19,7 @@ fs.readdir( __dirname + '/tests', async( err, files ) =>
 
     for( let file of files )
     {
-      //if( file !== 'join.js' ){ continue; }
+      //if( file !== 'errors.js' ){ continue; }
 
       let logger = new Logger( file );
       let test = require( __dirname + '/tests/' + file );

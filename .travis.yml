@@ -9,3 +9,5 @@ before_install:
   - mysql -e 'CREATE DATABASE test;'
 script:
   - npm test
+after_success:
+  - npm run coverage
