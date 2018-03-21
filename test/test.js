@@ -13,4 +13,6 @@ describe( 'Tests', ( done ) =>
       require( __dirname + '/tests/' + file );
     });
   }
+
+  setTimeout( () => { process.exit(); }, 100000 );
 });
