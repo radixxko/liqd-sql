@@ -109,6 +109,9 @@ it( 'Test', async() =>
   let test = await SQL( 'table_users' ).set( { id: 1, name: 'John D.' } );
   assert.ok( test.ok && test.affected_rows , 'Test '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
 
+	test = await SQL( 'table_users' ).set( { id: 1, name: 'John D.', surname: 'Doe' } );
+  assert.ok( test.ok && test.affected_rows , 'Test '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
+
   test = await SQL( 'table_users' ).update( { name: 'Max', surname: 'M.' } );
   assert.ok( test.ok && test.affected_rows , 'Test '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
 
@@ -123,7 +126,7 @@ it( 'Check', async() =>
 {
   let check = await SQL( 'table_users' ).get_all( 'id, name, surname' );
 
-  assert.deepEqual( check.rows , [  { id: 1, name: 'John D.', surname: null},
+  assert.deepEqual( check.rows , [  { id: 1, name: 'John D.', surname: 'Doe'},
                                     { id: 2, name: 'Max', surname: 'M.'},
                                     { id: 3, name: 'George', surname: null} ], 'Check failed ' + JSON.stringify( check, null, '  ' ) );
 });
