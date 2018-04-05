@@ -16,8 +16,21 @@ let insert, select, delete_row;
 
 it( 'Create', async() =>
 {
-  await SQL('DROP TABLE IF EXISTS update_users').execute();
-  await SQL('CREATE TABLE IF NOT EXISTS update_users ( id bigint unsigned NOT NULL, uid bigint unsigned NOT NULL, name varchar(255) NOT NULL, PRIMARY KEY (id), UNIQUE KEY uid (uid) )' ).execute();
+  await SQL('update_users').drop_table( true );
+
+	let update_users = await SQL( {
+		columns : {
+				id   	: { type: 'BIGINT:UNSIGNED' },
+				uid		: { type: 'BIGINT:UNSIGNED' },
+				name  : { type: 'VARCHAR:255' }
+		},
+		indexes : {
+			primary : 'id',
+			unique  : [ 'uid' ],
+			index   : []
+		}
+	}, 'update_users' ).create_table( true );
+
   await SQL( 'update_users' ).insert( [ { id: 1, uid: 1, name: 'John' }, { id: 2, uid: 2, name: 'Max' }, { id: 3, uid: 3, name: 'George' }, { id: 4, uid: 4, name: 'Janet' }, { id: 5, uid: 5, name: 'Kate' }, { id: 6, uid: 6, name: 'Tomas' } ] );
 });
 

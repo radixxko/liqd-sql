@@ -14,9 +14,9 @@ const SQL = require('../../lib/sql.js')(
   {
     table_users : {
       columns : {
-          id      : { type: 'BIGINT:UNSIGNED' },
+          id      : { type: 'BIGINT:UNSIGNED', increment: true },
           name    : { type: 'VARCHAR:255' },
-          surname : { type: 'VARCHAR:255', default: '' }
+          surname : { type: 'VARCHAR:255', null: true, default: 'NULL' }
       },
       indexes : {
         primary : 'id',
@@ -26,9 +26,9 @@ const SQL = require('../../lib/sql.js')(
     },
     table_address : {
       columns : {
-          id      : { type: 'BIGINT:UNSIGNED' },
+          id      : { type: 'BIGINT:UNSIGNED', increment: true },
           name    : { type: 'VARCHAR:255' },
-          city    : { type: 'VARCHAR:255', default: '' }
+          city    : { type: 'VARCHAR:255', null: true, default: 'NULL' }
       },
       indexes : {
         primary : null,
@@ -38,9 +38,9 @@ const SQL = require('../../lib/sql.js')(
     },
     table_cities : {
       columns : {
-          id      : { type: 'BIGINT:UNSIGNED' },
+          id      : { type: 'BIGINT:UNSIGNED', increment: true },
           name    : { type: 'VARCHAR:255' },
-          city    : { type: 'VARCHAR:255', default: '' }
+          city    : { type: 'VARCHAR:255', null: true, default: 'NULL' }
       },
       indexes : {
         primary : null,
@@ -55,13 +55,50 @@ let insert, select, delete_row;
 
 it( 'Create', async() =>
 {
-  await SQL( 'DROP TABLE IF EXISTS table_users' ).execute();
-  await SQL( 'DROP TABLE IF EXISTS table_address' ).execute();
-  await SQL( 'DROP TABLE IF EXISTS table_cities' ).execute();
-  await SQL( 'CREATE TABLE table_users ( id bigint(20) unsigned NOT NULL AUTO_INCREMENT, name varchar(255) NOT NULL, surname varchar(55) DEFAULT NULL, PRIMARY KEY (id), UNIQUE KEY name (name), KEY surname (surname) )' ).execute();
-  await SQL( 'CREATE TABLE table_address ( id bigint(20) unsigned NOT NULL AUTO_INCREMENT, name varchar(255) NOT NULL, city varchar(55) DEFAULT NULL, UNIQUE KEY name (name), KEY id (id) )' ).execute();
-  await SQL( 'CREATE TABLE table_cities ( id bigint(20) unsigned NOT NULL AUTO_INCREMENT, name varchar(255) NOT NULL, city varchar(55) DEFAULT NULL, UNIQUE KEY name (name), KEY id (id) )' ).execute();
-  await SQL( 'table_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' } ] );
+  await SQL( 'table_users' ).drop_table( true );
+  await SQL( 'table_address' ).drop_table( true );
+  await SQL( 'table_cities' ).drop_table( true );
+
+	let table_users = await SQL( {
+		columns : {
+				id      : { type: 'BIGINT:UNSIGNED', increment: true },
+				name    : { type: 'VARCHAR:255' },
+				surname : { type: 'VARCHAR:255', null: true, default: 'NULL' }
+		},
+		indexes : {
+			primary : 'id',
+			unique  : 'name',
+			index   : [ 'surname' ]
+		}
+	}, 'table_users' ).create_table( true );
+
+	let table_address = await SQL( {
+		columns : {
+				id      : { type: 'BIGINT:UNSIGNED', increment: true },
+				name    : { type: 'VARCHAR:255' },
+				city    : { type: 'VARCHAR:255', null: true, default: 'NULL' }
+		},
+		indexes : {
+			primary : null,
+			unique  : [ 'name' ],
+			index   : [ 'id' ]
+		}
+	}, 'table_address' ).create_table( true );
+
+	let table_cities = await SQL( {
+		columns : {
+				id      : { type: 'BIGINT:UNSIGNED', increment: true },
+				name    : { type: 'VARCHAR:255' },
+				city    : { type: 'VARCHAR:255', null: true, default: 'NULL' }
+		},
+		indexes : {
+			primary : null,
+			unique  : 'name',
+			index   : [ 'id' ]
+		}
+	}, 'table_cities' ).create_table( true );
+
+	await SQL( 'table_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' } ] );
   await SQL( 'table_address' ).insert( [ { name: 'John', city: 'City' }, { name: 'Max', city: 'Paradise' } ] );
   await SQL( 'table_cities' ).insert( [ { name: 'John', city: 'City' }, { name: 'Max', city: 'Paradise' } ] );
 });

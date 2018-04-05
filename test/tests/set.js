@@ -16,25 +16,78 @@ let insert, select, delete_row;
 
 it( 'Create', async() =>
 {
-  await SQL('DROP TABLE IF EXISTS set_users').execute();
-	await SQL('DROP TABLE IF EXISTS set_address').execute();
-  await SQL('CREATE TABLE set_users ( id bigint(20) unsigned NOT NULL AUTO_INCREMENT, name varchar(255) NOT NULL, description text NULL, created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, surname varchar(55) DEFAULT NULL, PRIMARY KEY (id), UNIQUE KEY name (name), KEY surname (surname) )').execute();
-	await SQL('CREATE TABLE set_address ( id bigint(20) unsigned NOT NULL AUTO_INCREMENT, addressID bigint(20) unsigned NOT NULL, name varchar(255) NOT NULL, description text NULL, created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, city varchar(55) DEFAULT NULL, PRIMARY KEY (id), UNIQUE KEY name (addressID,name), KEY city (city) )').execute();
-	await SQL( 'set_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' } ] );
-	await SQL( 'set_address' ).insert( [ { id: 1, addressID: 1, name: 'Home' }, { id: 2, addressID: 2, name: 'Office' }, { id: 3, addressID: 3, name: 'Out' } ] );
+	await SQL('set_users').drop_table( true );
+	await SQL('set_address').drop_table( true );
+	await SQL('set_phones').drop_table( true );
+
+	await SQL( {
+		columns :
+		{
+			id      		: { type: 'BIGINT:UNSIGNED', increment: true },
+			name    		: { type: 'VARCHAR:255' },
+			description	: { type: 'TEXT', null: true },
+			created 		: { type: 'TIMESTAMP', default: 'CURRENT_TIMESTAMP', update: 'CURRENT_TIMESTAMP' },
+			surname    	: { type: 'VARCHAR:55', null: true }
+		},
+		indexes : {
+			primary : 'id',
+			unique  : 'name',
+			index   : [ 'surname' ]
+		}
+	}, 'set_users' ).create_table( true );
+
+	await SQL( {
+		columns :
+		{
+			id      		: { type: 'BIGINT:UNSIGNED', increment: true },
+			addressID   : { type: 'BIGINT:UNSIGNED' },
+			name    		: { type: 'VARCHAR:255' },
+			description	: { type: 'TEXT', null: true },
+			created 		: { type: 'TIMESTAMP', default: 'CURRENT_TIMESTAMP', update: 'CURRENT_TIMESTAMP' },
+			city    		: { type: 'VARCHAR:55', null: true }
+		},
+		indexes : {
+			primary : 'id',
+			unique  : 'addressID,name',
+			index   : [ 'city' ]
+		}
+	}, 'set_address' ).create_table( true );
+
+	await SQL( {
+		columns :
+		{
+			userID      : { type: 'BIGINT:UNSIGNED' },
+			phone   		: { type: 'BIGINT:UNSIGNED' }
+		},
+		indexes : {
+			primary : '',
+			unique  : [ ],
+			index   : [ ]
+		}
+	}, 'set_phones' ).create_table( true );
+
+	//await SQL( 'set_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' } ] );
+	//await SQL( 'set_address' ).insert( [ { addressID: 1, name: 'Home' }, { addressID: 2, name: 'Office' }, { addressID: 3, name: 'Out' } ] );
 });
 
 it( 'Set', async() =>
 {
-  let cnt = 0;
-  let set = await SQL( 'set_users' ).set( { id: 1, name: 'John D.' } );
-  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+  let cnt = 0, set = null;
 
-  set = await SQL( 'set_users' ).set([ { id: 2, name: 'Max M.' }, { id: 3, name: 'George G.', description: { test: 'ok' } } ]);
-  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+	set = await SQL().set( { id: 1, name: 'John D.' } );
+  assert.ok( set.error && set.error.code === 'UNDEFINED_TABLE' , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
-  set = await SQL( 'set_users' ).set( [ { id: 4, name: 'Janet J.', description: null }, { name: 'Kate K.' } ] );
-  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+	set = await SQL( 'set_users' ).set( );
+  assert.ok( set.ok && set.affected_rows === 0 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+
+	set = await SQL( 'set_users' ).set( [{ id: 1, name: 'John D.' }] );
+  assert.ok( set.ok && set.inserted_id === 1, 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+
+	set = await SQL( 'set_users' ).set( [{ id: 1, name: 'John D.' }, { id: 2, name: 'Max M.' }, { id: 3, name: 'George G.', description: { test: 'ok' } } ] );
+	assert.deepEqual( set.inserted_ids, [ 2,3 ], 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+
+	set = await SQL( 'set_users' ).set( [ { id: 4, name: 'Janet J.', description: null }, { name: 'Kate K.' } ] );
+	assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
 	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', description: 'null' }, { addressID: 2, name: 'Office', description: 'Main' } ] );
   assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
@@ -42,8 +95,33 @@ it( 'Set', async() =>
 	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '&description': '\'Values\'' }, { addressID: 2, name: 'Office', '!description': 'Main' }, { addressID: 1, name: 'Home', '?description': 'Nice' } ] );
   assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
+	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '?description': 'New' }, { addressID: 2, name: 'Office', '?description': { description: 'Main' } }, { addressID: 4, name: 'Home', '?&description': { description: '\'Nice\'' } }, { addressID: 5, name: 'Home', '?&description': { '&_default': '\'Nice\'' } } ] );
+  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+
+	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '?description': { '&New': 'Main' } }, { addressID: 2, name: 'Office', '?description': { 'Main': 'Maintance' } } ] );
+  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+
+	set = await SQL( 'set_phones' ).set( [ { userID: 3, phone: '12345' } ] );
+	assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+
+	/*
+  set = await SQL( 'set_users' ).set([ { id: 2, name: 'Max M.' }, { id: 3, name: 'George G.', description: { test: 'ok' } } ]);
+  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+
+
+
+
+	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '&description': '\'Values\'' }, { addressID: 2, name: 'Office', '!description': 'Main' }, { addressID: 4, name: 'Homes', 'description': 'asa' } ] );
+  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+
+	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '&description': '\'Values\'' }, { addressID: 2, name: 'Office', '!description': 'Main' }, { addressID: 1, name: 'Home', '?&description': '\'Nice\'' } ] );
+  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+
+
+	*/
 });
 
+/*
 it( 'Check', async() =>
 {
   let check = await SQL( 'set_users' ).get_all( 'id, name, description, surname' );
@@ -61,3 +139,4 @@ it( 'Check', async() =>
 	                                  { id: 3, addressID: 3, name: 'Out', description: 'Values'} ], 'Check failed ' + JSON.stringify( check, null, '  ' ) );
 
 });
+*/

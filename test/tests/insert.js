@@ -16,19 +16,33 @@ let insert, select, delete_row;
 
 it( 'Create', async() =>
 {
-  await SQL('DROP TABLE IF EXISTS insert_users').execute();
-  let test = await SQL('CREATE TABLE insert_users ( id bigint(20) unsigned NOT NULL AUTO_INCREMENT, name varchar(255) NOT NULL, description text NULL, created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, surname varchar(55) DEFAULT NULL, PRIMARY KEY (id), UNIQUE KEY name (name), KEY surname (surname) )').execute();
+	await SQL('insert_users').drop_table( true );
+
+	await SQL({
+		columns :
+		{
+			id      		: { type: 'BIGINT:UNSIGNED', increment: true },
+			name    		: { type: 'VARCHAR:255' },
+			description : { type: 'TEXT', null: true },
+			created 		: { type: 'TIMESTAMP', default: 'CURRENT_TIMESTAMP', update: 'CURRENT_TIMESTAMP' },
+			surname    	: { type: 'VARCHAR:55', null: true }
+		},
+		indexes : {
+			primary : 'id',
+			unique  : ['name'],
+			index   : 'surname'
+		}
+	}, 'insert_users' ).create_table( true );
 });
 
 it( 'Insert', async() =>
 {
   let cnt = 0;
-  let insert = await SQL( 'insert_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' } ] );
-  insert = await SQL( 'insert_users' ).get_all() ;
-  assert.ok( insert.ok && insert.inserted_ids, 'Insert '+ (cnt++) +' failed ' + JSON.stringify( insert, null, '  ' ) );
+  let insert = await SQL( 'insert_users' ).insert( [ { name: 'John' }, { name: 'Max' } ] );
+  assert.ok( insert.ok && insert.affected_rows === 2, 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
 
-  insert = await SQL( 'insert_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' } ], 'ignore' );
-  assert.ok( insert.ok && insert.inserted_ids && insert.inserted_ids.length === 2 , 'Insert '+ (cnt++) +' failed ' + JSON.stringify( insert, null, '  ' ) );
+  insert = await SQL( 'insert_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' }, { name: 'Janet' } ], 'ignore' );
+  assert.ok( insert.ok && insert.affected_rows === 2 , 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
 
 });
 
