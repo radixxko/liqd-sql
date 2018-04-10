@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const SQLError = require( '../../lib/errors.js');
 const SQL = require('../../lib/sql.js')(
 {
 	mysql :
@@ -36,7 +37,8 @@ it( 'Create', async() =>
 		columns :
 		{
 			id      		: { type: 'BIGINT:UNSIGNED', increment: true },
-			name    		: { type: 'VARCHAR:255', default: 'name' }
+			name    		: { type: 'VARCHAR:255', default: 'name' },
+			uid    			: { type: 'BIGINT', default: 'NULL', null: true }
 		},
 		indexes : {
 			primary : 'id',
@@ -74,10 +76,10 @@ it( 'Errors', async() =>
 	assert.ok( !test.error , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
   test = await SQL( 'undefined' ).set( { id: 1, name: 'John' } );
-	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
   test = await SQL( 'undefined' ).update( { id: 1, name: 'John' } );
-	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
   test = await SQL( 'undefined' ).delete( { id: 1, name: 'John' } );
 	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
@@ -87,5 +89,9 @@ it( 'Errors', async() =>
 
   test = await SQL( 'tests' ).where('ids = :?', 'bad').update( { id: 1, name: 'John' } );
 	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+
+
+
+	//let error = new SQLError( ).get();
 
 });
