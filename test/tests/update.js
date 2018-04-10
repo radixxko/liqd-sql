@@ -37,17 +37,23 @@ it( 'Create', async() =>
 it( 'Update', async() =>
 {
   let cnt = 0;
-  let update = await SQL( 'update_users' ).update( { id: 1, name: 'John D.' } );
-  assert.ok( update.ok && update.affected_rows , 'Update '+ (cnt++) +' failed ' + JSON.stringify( update, null, '  ' ) );
+  let update = await SQL( ).update( { id: 1, name: 'John D.' } );
+  assert.ok( update.error && update.error.code === 'UNDEFINED_TABLE' , 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );
+
+	update = await SQL( 'update_users' ).update( );
+  assert.ok( update.ok && update.affected_rows === 0 , 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );
+
+	update = await SQL( 'update_users' ).update( { id: 1, name: 'John D.' } );
+	assert.ok( update.ok && update.affected_rows , 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );
 
   update = await SQL( 'update_users' ).update([ { id: 2, name: 'Max M.' }, { id: 3, name: 'George G.' } ]);
-  assert.ok( update.ok && update.affected_rows , 'Update '+ (cnt++) +' failed ' + JSON.stringify( update, null, '  ' ) );
+  assert.ok( update.ok && update.affected_rows , 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );
 
   update = await SQL( 'update_users' ).update( [ { id: 4, name: 'Janet J.' }, { uid: 6, name: 'Tomas T.' } ] );
-  assert.ok( update.ok && update.affected_rows , 'Update '+ (cnt++) +' failed ' + JSON.stringify( update, null, '  ' ) );
+  assert.ok( update.ok && update.affected_rows , 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );
 
   update = await SQL( 'update_users' ).where( 'id = :?', 5 ).update( 'name = :?', 'Kate K.' );
-  assert.ok( update.ok && update.affected_rows , 'Update '+ (cnt++) +' failed ' + JSON.stringify( update, null, '  ' ) );
+  assert.ok( update.ok && update.affected_rows , 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );
 
 });
 

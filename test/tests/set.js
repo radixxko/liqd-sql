@@ -89,7 +89,7 @@ it( 'Set', async() =>
 	set = await SQL( 'set_users' ).set( [ { id: 4, name: 'Janet J.', description: null }, { name: 'Kate K.' } ] );
 	assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
-	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', description: 'null' }, { addressID: 2, name: 'Office', description: 'Main' } ] );
+	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', description: 'null' }, { addressID: 2, name: 'Office', '!description': '' } ] );
   assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
 	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '&description': '\'Values\'' }, { addressID: 2, name: 'Office', '!description': 'Main' }, { addressID: 1, name: 'Home', '?description': 'Nice' } ] );
@@ -98,30 +98,15 @@ it( 'Set', async() =>
 	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '?description': 'New' }, { addressID: 2, name: 'Office', '?description': { description: 'Main' } }, { addressID: 4, name: 'Home', '?&description': { description: '\'Nice\'' } }, { addressID: 5, name: 'Home', '?&description': { '&_default': '\'Nice\'' } } ] );
   assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
-	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '?description': { '&New': 'Main' } }, { addressID: 2, name: 'Office', '?description': { 'Main': 'Maintance' } } ] );
+	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '?description': { '&Values': '\'Main\'' } }, { addressID: 2, name: 'Office', '?description': { 'Main': 'Maintance' } } ] );
   assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
 	set = await SQL( 'set_phones' ).set( [ { userID: 3, phone: '12345' } ] );
 	assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
-
-	/*
-  set = await SQL( 'set_users' ).set([ { id: 2, name: 'Max M.' }, { id: 3, name: 'George G.', description: { test: 'ok' } } ]);
-  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
-
-
-
-
-	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '&description': '\'Values\'' }, { addressID: 2, name: 'Office', '!description': 'Main' }, { addressID: 4, name: 'Homes', 'description': 'asa' } ] );
-  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
-
-	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '&description': '\'Values\'' }, { addressID: 2, name: 'Office', '!description': 'Main' }, { addressID: 1, name: 'Home', '?&description': '\'Nice\'' } ] );
-  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
-
-
-	*/
+	
 });
 
-/*
+
 it( 'Check', async() =>
 {
   let check = await SQL( 'set_users' ).get_all( 'id, name, description, surname' );
@@ -134,9 +119,10 @@ it( 'Check', async() =>
 
 	check = await SQL( 'set_address' ).get_all( 'id,addressID, name, description' );
 
-	assert.deepEqual( check.rows , [  { id: 1, addressID: 1, name: 'Home', description: null },
-	                                  { id: 2, addressID: 2, name: 'Office', description: 'Main' },
-	                                  { id: 3, addressID: 3, name: 'Out', description: 'Values'} ], 'Check failed ' + JSON.stringify( check, null, '  ' ) );
+	assert.deepEqual( check.rows , [  { id: 1, addressID: 3, name: 'Out', description: 'Main' },
+	                                  { id: 2, addressID: 2, name: 'Office', description: 'Maintance' },
+	                                  { id: 3, addressID: 1, name: 'Home', description: 'Nice'},
+																		{ id: 4, addressID: 4, name: 'Home', description: ''},
+																		{ id: 5, addressID: 5, name: 'Home', description: 'Nice'} ], 'Check failed ' + JSON.stringify( check, null, '  ' ) );
 
 });
-*/
