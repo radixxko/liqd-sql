@@ -49,7 +49,9 @@ it( 'Create', async() =>
 	await SQL( 'join_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' }, { id: 5, name: 'Kate' } ] );
 	await SQL( 'join_users' ).set( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George G' }, { id: 4, name: 'Janet J' }, { id: 5, name: 'Kate K' } ] );
   await SQL( 'join_address' ).set( [ { id: 1, city: 'City' }, { id: 2, city: 'New' }, { id: 3, city: 'Old' } ] );
-});
+
+
+}).timeout(100000);
 
 it( 'Join', async() =>
 {
@@ -77,4 +79,5 @@ it( 'Join', async() =>
                                 { id: 2, name: 'Max', active: 1, city: 'New' },
                                 { id: 3, name: 'George G', active: 1, city: 'Old' } ], 'Test join '+(++cnt)+' failed ' + JSON.stringify( join, null, '  ' ) );
 
-});
+
+}).timeout(100000);

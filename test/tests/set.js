@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const TimedPromise = require('liqd-timed-promise');
 const SQL = require('../../lib/sql.js')(
 {
 	mysql :
@@ -68,7 +69,7 @@ it( 'Create', async() =>
 
 	//await SQL( 'set_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' } ] );
 	//await SQL( 'set_address' ).insert( [ { addressID: 1, name: 'Home' }, { addressID: 2, name: 'Office' }, { addressID: 3, name: 'Out' } ] );
-});
+}).timeout(100000);
 
 it( 'Set', async() =>
 {
@@ -90,21 +91,21 @@ it( 'Set', async() =>
 	assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
 	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', description: 'null' }, { addressID: 2, name: 'Office', '!description': '' } ] );
-  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+  assert.ok( set.ok && set.affected_rows === 2  , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+	assert.deepEqual( set.inserted_ids, [ 1,2 ], 'Set '+ (cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
 	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '&description': '\'Values\'' }, { addressID: 2, name: 'Office', '!description': 'Main' }, { addressID: 1, name: 'Home', '?description': 'Nice' } ] );
-  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+  assert.ok( set.ok && set.affected_rows === 3 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
 	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '?description': 'New' }, { addressID: 2, name: 'Office', '?description': { description: 'Main' } }, { addressID: 4, name: 'Home', '?&description': { description: '\'Nice\'' } }, { addressID: 5, name: 'Home', '?&description': { '&_default': '\'Nice\'' } } ] );
-  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+  assert.ok( set.ok && set.affected_rows === 4 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
 	set = await SQL( 'set_address' ).set( [ { addressID: 3, name: 'Out', '?description': { '&Values': '\'Main\'' } }, { addressID: 2, name: 'Office', '?description': { 'Main': 'Maintance' } } ] );
-  assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+  assert.ok( set.ok && set.affected_rows === 2, 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
 
 	set = await SQL( 'set_phones' ).set( [ { userID: 3, phone: '12345' } ] );
-	assert.ok( set.ok && set.affected_rows , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
-	
-});
+	assert.ok( set.ok && set.affected_rows === 1 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
+}).timeout(100000);
 
 
 it( 'Check', async() =>
@@ -125,4 +126,4 @@ it( 'Check', async() =>
 																		{ id: 4, addressID: 4, name: 'Home', description: ''},
 																		{ id: 5, addressID: 5, name: 'Home', description: 'Nice'} ], 'Check failed ' + JSON.stringify( check, null, '  ' ) );
 
-});
+}).timeout(100000);

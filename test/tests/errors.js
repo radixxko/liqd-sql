@@ -46,7 +46,7 @@ it( 'Create', async() =>
 			index   : []
 		}
 	}, 'tests' ).create_table( true );
-});
+}).timeout(100000);
 
 it( 'Errors', async() =>
 {
@@ -79,7 +79,7 @@ it( 'Errors', async() =>
 	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
   test = await SQL( 'undefined' ).update( { id: 1, name: 'John' } );
-	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+	assert.ok( test.error && test.error.code === 'INVALID_ENTRY' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
   test = await SQL( 'undefined' ).delete( { id: 1, name: 'John' } );
 	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
@@ -90,8 +90,6 @@ it( 'Errors', async() =>
   test = await SQL( 'tests' ).where('ids = :?', 'bad').update( { id: 1, name: 'John' } );
 	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-
-
 	//let error = new SQLError( ).get();
 
-});
+}).timeout(100000);

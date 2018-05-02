@@ -47,7 +47,7 @@ it( 'Create', async() =>
 
   check = await SQL( 'create_user_2' ).insert( { name: 'John' } );
   assert.ok( check.ok && check.affected_rows === 1, 'Create failed 2' + JSON.stringify( check, null, '  ' ) );
-});
+}).timeout(100000);
 
 it( 'Drop', async() =>
 {
@@ -58,4 +58,4 @@ it( 'Drop', async() =>
   await SQL( SQL( 'create_user_2' ).drop_table() ).execute();
   check = await SQL( 'create_user_2' ).insert( { name: 'John' } );
   assert.ok( check.error && check.error.code === 'EREQUEST', 'Drop failed 2' + JSON.stringify( check, null, '  ' ) );
-});
+}).timeout(100000);

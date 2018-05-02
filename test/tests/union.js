@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const TimedPromise = require('liqd-timed-promise');
 const SQL = require('../../lib/sql.js')(
 {
 	mysql :
@@ -46,7 +47,7 @@ it( 'Create', async() =>
 
 	await SQL( 'union_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' }, { name: 'Janet' } ] );
   await SQL( 'union_address' ).insert( [ { street: '5th', city: 'City' }, { street: 'Main', city: 'City' }, { street: 'Main', city: 'Paradise' }, { street: 'In', city: 'Paradise' }, { street: 'Second', city: 'Paradise' }  ] );
-});
+}).timeout(100000);
 
 it( 'Union', async() =>
 {
@@ -70,6 +71,25 @@ it( 'Union', async() =>
                               { addressID: 3, userName: 'George', street: 'Main', city: 'Paradise' },
                               { addressID: null, userName: 'Cooper', street: null, city: null }], 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
 
+	union = await SQL( null, 'alias' )
+		.union( [ data1, data2, SQL('union_users').where('name LIKE :?', 'John'), SQL('union_users').where('name LIKE :?', 'George').limit(1), SQL('union_users').where('name LIKE :?', 'Janet').columns( 'id, name' ) ] )
+		.join( 'union_address a', 'alias.id = a.id' )
+		.order_by( 'alias.name DESC' )
+		.get_all( 'a.id :addressID, alias.name :name, a.street, a.city', { addressID: 'addressID', name: 'userName' } );
+	assert.deepEqual( union.rows, [ { addressID: 5, userName: 'Kate', street: 'Second', city: 'Paradise' },
+															{ addressID: 1, userName: 'John', street: '5th', city: 'City' },
+															{ addressID: 4, userName: 'Janet', street: 'In', city: 'Paradise' },
+															{ addressID: null, userName: 'Iron', street: null, city: null },
+															{ addressID: 3, userName: 'George', street: 'Main', city: 'Paradise' },
+															{ addressID: null, userName: 'Cooper', street: null, city: null }], 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
+
+	union = await SQL( null, 'alias' )
+		.union( [] )
+		.join( 'union_address a', 'alias.id = a.id' )
+		.order_by( 'alias.name DESC' )
+		.get_all( 'a.id :addressID, alias.name :name, a.street, a.city', { addressID: 'addressID', name: 'userName' } );
+	assert.ok( !union.ok && union.error && union.error.code === 'UNDEFINED_TABLE' , 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
+
   union = await SQL( data1, 'alias' )
       .union( data2 )
       .union( SQL('union_users').where('name LIKE :?', 'John') )
@@ -89,7 +109,6 @@ it( 'Union', async() =>
 			.union( data1 )
 			.union( data3 )
 			.limit(5)
-			.order_by( 'a.id' )
       .get_all( 'a.id, a.street, a.city' );
   assert.deepEqual( union.rows, [{ id: 1, street: '5th', city: 'City' },
 															{ id: 2, street: 'Main', city: 'City' },
@@ -123,4 +142,4 @@ it( 'Union', async() =>
                               { id: 4, street: 'In', city: 'Paradise' },
                               { id: 5, street: 'Second', city: 'Paradise' }], 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
 
-});
+}).timeout(100000);

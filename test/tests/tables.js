@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const TimedPromise = require('liqd-timed-promise');
 const SQL = require('../../lib/sql.js')(
 {
 	mysql :
@@ -101,7 +102,7 @@ it( 'Create', async() =>
 	await SQL( 'table_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' } ] );
   await SQL( 'table_address' ).insert( [ { name: 'John', city: 'City' }, { name: 'Max', city: 'Paradise' } ] );
   await SQL( 'table_cities' ).insert( [ { name: 'John', city: 'City' }, { name: 'Max', city: 'Paradise' } ] );
-});
+}).timeout(100000);
 
 it( 'Test', async() =>
 {
@@ -120,7 +121,7 @@ it( 'Test', async() =>
 
   test = await SQL( 'table_cities' ).update( { name: 'John', city: 'New City' } );
   assert.ok( test.ok && test.affected_rows , 'Test '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
-});
+}).timeout(100000);
 
 it( 'Check', async() =>
 {
@@ -129,4 +130,4 @@ it( 'Check', async() =>
   assert.deepEqual( check.rows , [  { id: 1, name: 'John D.', surname: 'Doe'},
                                     { id: 2, name: 'Max', surname: 'M.'},
                                     { id: 3, name: 'George', surname: null} ], 'Check failed ' + JSON.stringify( check, null, '  ' ) );
-});
+}).timeout(100000);

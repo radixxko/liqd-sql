@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const TimedPromise = require('liqd-timed-promise');
 const SQL = require('../../lib/sql.js')(
 {
 	mysql :
@@ -47,7 +48,7 @@ it( 'Create', async() =>
 			unique  : []
 		}
 	}, 'insert_users_2' ).create_table( true );
-});
+}).timeout(100000);
 
 it( 'Insert', async() =>
 {
@@ -67,7 +68,7 @@ it( 'Insert', async() =>
 	insert = await SQL( 'insert_users_2' ).insert( [ { id: 1, name: 'John', surname: 'J.' }, { id: 2, name: 'Max', surname: 'M.' }, { id: 3, name: 'George', surname: 'G.' }, { id: 4, name: 'Janet', surname: 'J.' }, { id: 5, name: 'Kate', surname: 'K.' } ] );
   assert.ok( insert.ok && insert.affected_rows === 5 , 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
 
-});
+}).timeout(100000);
 
 it( 'Check', async() =>
 {
@@ -78,4 +79,4 @@ it( 'Check', async() =>
                                     { id: 3, name: 'George', description: null, surname: null},
                                     { id: 4, name: 'Janet', description: null, surname: null } ], 'Check failed ' + JSON.stringify( check, null, '  ' ) );
 
-});
+}).timeout(100000);
