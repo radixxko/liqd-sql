@@ -468,7 +468,7 @@ Output
 
 ## Insert
 
-### .insert( data[, ingore = false] )
+### .insert( data[, ignore = false] )
 
 - `data` {Array|Object}
 - `ignore` {Boolean}
