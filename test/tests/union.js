@@ -72,18 +72,6 @@ it( 'Union', async() =>
                               { addressID: null, userName: 'Cooper', street: null, city: null }], 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
 
 	union = await SQL( null, 'alias' )
-		.union( [ data1, data2, SQL('union_users').where('name LIKE :?', 'John'), SQL('union_users').where('name LIKE :?', 'George').limit(1), SQL('union_users').where('name LIKE :?', 'Janet').columns( 'id, name' ) ] )
-		.join( 'union_address a', 'alias.id = a.id' )
-		.order_by( 'alias.name DESC' )
-		.get_all( 'a.id :addressID, alias.name :name, a.street, a.city', { addressID: 'addressID', name: 'userName' } );
-	assert.deepEqual( union.rows, [ { addressID: 5, userName: 'Kate', street: 'Second', city: 'Paradise' },
-															{ addressID: 1, userName: 'John', street: '5th', city: 'City' },
-															{ addressID: 4, userName: 'Janet', street: 'In', city: 'Paradise' },
-															{ addressID: null, userName: 'Iron', street: null, city: null },
-															{ addressID: 3, userName: 'George', street: 'Main', city: 'Paradise' },
-															{ addressID: null, userName: 'Cooper', street: null, city: null }], 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
-
-	union = await SQL( null, 'alias' )
 		.union( [] )
 		.join( 'union_address a', 'alias.id = a.id' )
 		.order_by( 'alias.name DESC' )

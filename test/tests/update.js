@@ -71,6 +71,9 @@ it( 'Update', async() =>
   update = await SQL( 'update_users' ).where( 'id = :?', 5 ).update( 'name = :?', 'Kate K.' );
   assert.ok( update.ok && update.affected_rows  === 1, 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );
 
+	update = await SQL( 'update_users' ).where( 'id = :? ', 1 ).update( { name: 'JOHN D.' } );
+	assert.ok( update.ok && update.affected_rows === 1, 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) )
+
 	update = await SQL( 'update_users_2' ).update( { id: 1, name: 'John D.' } );
   assert.ok( update.error && update.error.code === 'INVALID_ENTRY', 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );
 }).timeout(100000);
@@ -79,7 +82,7 @@ it( 'Check', async() =>
 {
   let check = await SQL( 'update_users' ).get_all();
 
-  assert.deepEqual( check.rows , [  { id: 1, uid: 1, name: 'John D.'},
+  assert.deepEqual( check.rows , [  { id: 1, uid: 1, name: 'JOHN D.'},
                                     { id: 2, uid: 2, name: 'Max M.'},
                                     { id: 3, uid: 3, name: 'George G.'},
                                     { id: 4, uid: 4, name: 'Janet J.' },

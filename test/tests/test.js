@@ -116,7 +116,7 @@ it( 'Create', async() =>
 it( 'Limit', async() =>
 {
   let cnt = 0;
-  let limit = await SQL( 'test_users' ).limit( 2 ).get_all('id,name');
+  let limit = await SQL( 'test_users' ).limit( 2 ).select('id,name');
   assert.ok( limit.ok && limit.rows && limit.rows.length === 2 , 'Limit '+ (++cnt) +' failed ' + JSON.stringify( limit, null, '  ' ) );
 
 }).timeout(100000);
