@@ -62,7 +62,7 @@ it( 'Insert', async() =>
 	insert = await SQL( 'insert_users' ).insert( [ { name: 'John' }, { name: 'Max' } ] );
   assert.ok( insert.ok && insert.affected_rows === 2, 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
 
-  insert = await SQL( 'insert_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' }, { name: 'Janet' } ], 'ignore' );
+  insert = await SQL( 'insert_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' }, { name: 'Janet' } ], true );
   assert.ok( insert.ok && insert.affected_rows === 2 , 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
 
 	insert = await SQL( 'insert_users_2' ).insert( [ { id: 1, name: 'John', surname: 'J.' }, { id: 2, name: 'Max', surname: 'M.' }, { id: 3, name: 'George', surname: 'G.' }, { id: 4, name: 'Janet', surname: 'J.' }, { id: 5, name: 'Kate', surname: 'K.' } ] );

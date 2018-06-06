@@ -470,8 +470,8 @@ Output
 
 ### .insert( data[, ingore = false] )
 
-- `set` {Array|Object}
-- `ingore` {Boolean}
+- `data` {Array|Object}
+- `ignore` {Boolean}
 
 ```js
 let data = await SQL( 'users' ).insert( { id: 1, name: 'John', surname: 'D.' } );
