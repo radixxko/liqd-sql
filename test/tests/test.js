@@ -113,6 +113,14 @@ it( 'Create', async() =>
   await SQL( 'test_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' }, { name: 'Janet' }, { name: 'Janet' }, { name: 'Max' }, { name: 'Janet' } ] );
 }).timeout(100000);
 
+it( 'Where', async() =>
+{
+  let cnt = 0;
+  let where = await SQL( 'test_users' ).where( [ { id: 1 }, { id: 2 } ] ).limit( 2 ).select('id,name');
+  assert.ok( where.ok && where.rows && where.rows.length === 2 , 'Where '+ (++cnt) +' failed ' + JSON.stringify( where, null, '  ' ) );
+
+}).timeout(100000);
+
 it( 'Limit', async() =>
 {
   let cnt = 0;
