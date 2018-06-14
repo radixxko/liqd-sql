@@ -78,8 +78,6 @@ it( 'Union', async() =>
 		.union( await SQL.query('union_users').where('name LIKE :?', 'Janet').get_all_query( 'id, name' ) )
 		.get_union(  );
 
-	console.log( '???', union );
-
 	union = await SQL.query( null, 'alias' )
 		.union( [] )
 		.join( 'union_address a', 'alias.id = a.id' )
