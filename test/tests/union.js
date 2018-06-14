@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const TimedPromise = require('liqd-timed-promise');
-const SQL = require('../../lib/sql.js')(
+const SQL = new (require('../../lib/sql.js'))(
 {
 	mysql :
 	{
@@ -17,10 +17,10 @@ let insert, select, delete_row;
 
 it( 'Create', async() =>
 {
-  await SQL('union_users').drop_table( true );
-  await SQL('union_address').drop_table( true );
+  await SQL.query('union_users').drop_table( true );
+  await SQL.query('union_address').drop_table( true );
 
-	let union_users = await SQL( {
+	let union_users = await SQL.query( {
 		columns : {
 				id      : { type: 'BIGINT:UNSIGNED', increment: true },
 				name    : { type: 'VARCHAR:255' }
@@ -32,7 +32,7 @@ it( 'Create', async() =>
 		}
 	}, 'union_users' ).create_table( true );
 
-	let union_address = await SQL( {
+	let union_address = await SQL.query( {
 		columns : {
 				id      : { type: 'BIGINT:UNSIGNED', increment: true },
 				street	: { type: 'VARCHAR:255' },
@@ -45,8 +45,8 @@ it( 'Create', async() =>
 		}
 	}, 'union_address' ).create_table( true );
 
-	await SQL( 'union_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' }, { name: 'Janet' } ] );
-  await SQL( 'union_address' ).insert( [ { street: '5th', city: 'City' }, { street: 'Main', city: 'City' }, { street: 'Main', city: 'Paradise' }, { street: 'In', city: 'Paradise' }, { street: 'Second', city: 'Paradise' }  ] );
+	await SQL.query( 'union_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' }, { name: 'Janet' } ] );
+  await SQL.query( 'union_address' ).insert( [ { street: '5th', city: 'City' }, { street: 'Main', city: 'City' }, { street: 'Main', city: 'Paradise' }, { street: 'In', city: 'Paradise' }, { street: 'Second', city: 'Paradise' }  ] );
 }).timeout(100000);
 
 it( 'Union', async() =>
@@ -56,11 +56,11 @@ it( 'Union', async() =>
   let data2 = [{ name: 'Cooper' }, { id: 78, name: 'Iron' }];
 	let data3 = [ { id : 5, name: 'Kate' }, { id: 78, name: 'Iron' } ];
 
-	let union = await SQL( data1, 'alias' )
+	let union = await SQL.query( data1, 'alias' )
     .union( data2 )
-    .union( SQL('union_users').where('name LIKE :?', 'John') )
-    .union( SQL('union_users').where('name LIKE :?', 'George').limit(1) )
-    .union( SQL('union_users').where('name LIKE :?', 'Janet').columns( 'id, name' ) )
+    .union( SQL.query('union_users').where('name LIKE :?', 'John') )
+    .union( SQL.query('union_users').where('name LIKE :?', 'George').limit(1) )
+    .union( SQL.query('union_users').where('name LIKE :?', 'Janet').columns( 'id, name' ) )
     .join( 'union_address a', 'alias.id = a.id' )
 		.order_by( 'alias.name DESC' )
     .get_all( 'a.id :addressID, alias.name :name, a.street, a.city', { addressID: 'addressID', name: 'userName' } );
@@ -71,18 +71,27 @@ it( 'Union', async() =>
                               { addressID: 3, userName: 'George', street: 'Main', city: 'Paradise' },
                               { addressID: null, userName: 'Cooper', street: null, city: null }], 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
 
-	union = await SQL( null, 'alias' )
+
+
+	 union = await SQL.query( await SQL.query('union_users').where('name LIKE :?', 'John').get_all_query( 'id, name' ) )
+		.union( await SQL.query('union_users').where('name LIKE :?', 'George').limit(1).get_all_query( 'id, name' ) )
+		.union( await SQL.query('union_users').where('name LIKE :?', 'Janet').get_all_query( 'id, name' ) )
+		.get_union(  );
+
+	console.log( '???', union );
+
+	union = await SQL.query( null, 'alias' )
 		.union( [] )
 		.join( 'union_address a', 'alias.id = a.id' )
 		.order_by( 'alias.name DESC' )
 		.get_all( 'a.id :addressID, alias.name :name, a.street, a.city', { addressID: 'addressID', name: 'userName' } );
 	assert.ok( !union.ok && union.error && union.error.code === 'UNDEFINED_TABLE' , 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
 
-  union = await SQL( data1, 'alias' )
+  union = await SQL.query( data1, 'alias' )
       .union( data2 )
-      .union( SQL('union_users').where('name LIKE :?', 'John') )
-      .union( SQL('union_users').where('name LIKE :?', 'George').limit(1) )
-      .union( SQL('union_users u').where('u.name LIKE :?', 'Janet').columns( 'u.id id' ) )
+      .union( SQL.query('union_users').where('name LIKE :?', 'John') )
+      .union( SQL.query('union_users').where('name LIKE :?', 'George').limit(1) )
+      .union( SQL.query('union_users u').where('u.name LIKE :?', 'Janet').columns( 'u.id id' ) )
       .inner_join( 'union_address a', 'alias.id = a.id' )
       .get_all( 'a.id, a.street, a.city' );
   assert.deepEqual( union.rows, [{ id: 1, street: '5th', city: 'City' },
@@ -90,9 +99,9 @@ it( 'Union', async() =>
                               { id: 4, street: 'In', city: 'Paradise' },
                               { id: 5, street: 'Second', city: 'Paradise' }], 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
 
-	union = await SQL( SQL('union_users').where('name LIKE :?', 'John'), 'alias' )
-      .union( SQL('union_users').where('name LIKE :?', 'George').limit(1) )
-      .union( SQL('union_users u').where('u.name LIKE :?', 'Janet').columns( 'u.id id, u.name name' ) )
+	union = await SQL.query( SQL.query('union_users').where('name LIKE :?', 'John'), 'alias' )
+      .union( SQL.query('union_users').where('name LIKE :?', 'George').limit(1) )
+      .union( SQL.query('union_users u').where('u.name LIKE :?', 'Janet').columns( 'u.id id, u.name name' ) )
       .inner_join( 'union_address a', '1 = 1' )
 			.union( data1 )
 			.union( data3 )
@@ -104,11 +113,11 @@ it( 'Union', async() =>
                               { id: 4, street: 'In', city: 'Paradise' },
                               { id: 5, street: 'Second', city: 'Paradise' }], 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
 
-  union = await SQL( data2 )
+  union = await SQL.query( data2 )
     .union( data1 )
-    .union( SQL('union_users').where('name LIKE :?', 'John') )
-    .union( SQL('union_users').where('name LIKE :?', 'George').limit(1) )
-    .union( SQL('union_users u').where('u.name LIKE :?', 'Janet').columns( 'u.id id, u.name name' ) )
+    .union( SQL.query('union_users').where('name LIKE :?', 'John') )
+    .union( SQL.query('union_users').where('name LIKE :?', 'George').limit(1) )
+    .union( SQL.query('union_users u').where('u.name LIKE :?', 'Janet').columns( 'u.id id, u.name name' ) )
     .where( 'id > 0' )
 		.order_by( 'id DESC' )
     .get_all( 'name :name, id :id', { name: 'user_name', id: 'user_id' } );
@@ -118,11 +127,11 @@ it( 'Union', async() =>
                                 { user_name: 'George', user_id: 3 },
                                 { user_name: 'John', user_id: 1 } ], 'Union '+(++cnt)+' failed ' + JSON.stringify( union, null, '  ' ) );
 
-	union = await SQL( data1, 'uni-alias' )
+	union = await SQL.query( data1, 'uni-alias' )
       .union( data2 )
-      .union( SQL('union_users').where('name LIKE :?', 'John') )
-      .union( SQL('union_users').where('name LIKE :?', 'George').limit(1) )
-      .union( SQL('union_users u').where('u.name LIKE :?', 'Janet').columns( 'u.id id' ) )
+      .union( SQL.query('union_users').where('name LIKE :?', 'John') )
+      .union( SQL.query('union_users').where('name LIKE :?', 'George').limit(1) )
+      .union( SQL.query('union_users u').where('u.name LIKE :?', 'Janet').columns( 'u.id id' ) )
       .inner_join( 'union_address a', 'uni-alias.id = a.id' )
       .get_all( 'a.id, a.street, a.city' );
   assert.deepEqual( union.rows, [ { id: 1, street: '5th', city: 'City' },

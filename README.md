@@ -39,26 +39,29 @@ $ npm i liqd-sql
 
 ## Usage
 ```js
-let SQL = require('liqd-sql')({
-	mysql : {
-    host      : 'localhost',
-		user      : 'root',
-		password  : '',
-		database	: 'test'
+const SQL = new (require('../../lib/sql.js'))(
+{
+	mysql :
+	{
+    host            : 'localhost',
+		user            : 'root',
+		password        : '',
+		database		    : 'test'
 	}
+})
 });
 ```
 
 ## Create table
 
-### SQL( config, table ).select_query( execute )
+### SQL.query( config, table ).select_query( execute )
 
 - `config` {Object}
 - `table` {String}
 - `execute` {Boolean}
 
 ```js
-await SQL({
+await SQL.query({
 	columns :
 	{
 		id	   : { type: 'BIGINT:UNSIGNED', increment: true },
@@ -73,7 +76,7 @@ await SQL({
 	}
 }, 'users' ).create_table( true );
 
-await SQL({
+await SQL.query({
 	columns :
 	{
 		id	 : { type: 'BIGINT:UNSIGNED', increment: true },
@@ -95,7 +98,7 @@ await SQL({
 - `data` {Any}
 
 ```js
-let data = await SQL( 'users' ).select_row();
+let data = await SQL.query( 'users' ).select_row();
 ```
 
 Output
@@ -123,7 +126,7 @@ Output
 - `data` {Any}
 
 ```js
-let data = await SQL( 'users' ).select();
+let data = await SQL.query( 'users' ).select();
 ```
 
 Output
@@ -154,7 +157,7 @@ Output
 - `alias` {String}
 
 ```js
-let data = await SQL( 'users' ).select_row_query();
+let data = await SQL.query( 'users' ).select_row_query();
 ```
 
 Output
@@ -169,7 +172,7 @@ Output
 - `alias` {String}
 
 ```js
-let data = await SQL( 'users' ).select_query();  
+let data = await SQL.query( 'users' ).select_query();  
 ```
 
 Output
@@ -223,7 +226,7 @@ Output
 - `data` {Any}
 
 ```js
-let data = await SQL( 'users u' ).join( 'cities c', 'u.cityID = c.id' ).select_query( '*' );
+let data = await SQL.query( 'users u' ).join( 'cities c', 'u.cityID = c.id' ).select_query( '*' );
 ```
 
 Output
@@ -240,7 +243,7 @@ Output
 - `data` {Any}
 
 ```js
-let data = await SQL( 'users u' ).inner_join( 'cities c', 'u.cityID = c.id' ).select_query( '*' );
+let data = await SQL.query( 'users u' ).inner_join( 'cities c', 'u.cityID = c.id' ).select_query( '*' );
 ```
 
 Output
@@ -262,7 +265,7 @@ Output
 - `data` {Any}
 
 ```js
-let data = await SQL( 'users' ).where( ' id > 10 AND name = :?', 'John' ).select_query( '*' );
+let data = await SQL.query( 'users' ).where( ' id > 10 AND name = :?', 'John' ).select_query( '*' );
 ```
 
 Output
@@ -271,7 +274,7 @@ Output
 ```
 
 ```js
-let data = await SQL( 'users' ).where( ' id > 10 ' ).where( 'name = :?', 'John' ).select_query( '*' );
+let data = await SQL.query( 'users' ).where( ' id > 10 ' ).where( 'name = :?', 'John' ).select_query( '*' );
 ```
 
 Output
@@ -287,7 +290,7 @@ Output
 - `data` {Any}
 
 ```js
-let data = await SQL( 'users' ).order_by( 'name ASC, surname DESC' ).select_query( '*' );
+let data = await SQL.query( 'users' ).order_by( 'name ASC, surname DESC' ).select_query( '*' );
 ```
 
 Output
@@ -305,7 +308,7 @@ Output
 - `data` {Any}
 
 ```js
-let data = await SQL( 'users' ).group_by( 'surname DESC' ).select_query( '*' );
+let data = await SQL.query( 'users' ).group_by( 'surname DESC' ).select_query( '*' );
 ```
 
 Output
@@ -321,7 +324,7 @@ Output
 - `data` {Any}
 
 ```js
-let data = await SQL( 'users' ).having( 'id > 3' ).select_query( '*' );
+let data = await SQL.query( 'users' ).having( 'id > 3' ).select_query( '*' );
 ```
 
 Output
@@ -336,7 +339,7 @@ Output
 - `limit` {Number}
 
 ```js
-let data = await SQL( 'users' ).limit( 15 ).select_query( '*' );
+let data = await SQL.query( 'users' ).limit( 15 ).select_query( '*' );
 ```
 
 Output
@@ -351,7 +354,7 @@ Output
 - `offset` {Number}
 
 ```js
-let data = await SQL( 'users' ).limit( 15 ).offset( 15 ).select_query( '*' );
+let data = await SQL.query( 'users' ).limit( 15 ).offset( 15 ).select_query( '*' );
 ```
 
 Output
@@ -364,7 +367,7 @@ Output
 ### .execute()
 
 ```js
-let data = await SQL( 'SELECT * FROM users' ).execute();
+let data = await SQL.query( 'SELECT * FROM users' ).execute();
 ```
 
 Output
@@ -395,7 +398,7 @@ Output
 
 ### Update with indexes
 ```js
-let data = await SQL( 'users' ).update( { id: 1, name: 'Johnson' } );
+let data = await SQL.query( 'users' ).update( { id: 1, name: 'Johnson' } );
 ```
 
 Output
@@ -419,7 +422,7 @@ Output
 
 ### Update with where
 ```js
-let data = await SQL( 'users' ).where( 'id = 1' ).update( { name: 'Johnson' } );
+let data = await SQL.query( 'users' ).where( 'id = 1' ).update( { name: 'Johnson' } );
 ```
 
 Output
@@ -444,7 +447,7 @@ Output
 
 ### Update with string
 ```js
-let data = await SQL( 'users' ).where( 'id = 1' ).update( 'name = :?', 'Johnson' } );
+let data = await SQL.query( 'users' ).where( 'id = 1' ).update( 'name = :?', 'Johnson' } );
 ```
 
 Output
@@ -474,7 +477,7 @@ Output
 - `ignore` {Boolean}
 
 ```js
-let data = await SQL( 'users' ).insert( { id: 1, name: 'John', surname: 'D.' } );
+let data = await SQL.query( 'users' ).insert( { id: 1, name: 'John', surname: 'D.' } );
 ```
 
 Output  
@@ -497,7 +500,7 @@ Output
 ```
 
 ```js
-let data = await SQL( 'users' ).insert( { id: 1, name: 'John', surname: 'D.' }, true );
+let data = await SQL.query( 'users' ).insert( { id: 1, name: 'John', surname: 'D.' }, true );
 ```
 
 Output  
@@ -526,7 +529,7 @@ Output
 - `data` {Array|Object}
 
 ```js
-let data = await SQL( 'users' ).set( { id: 1, name: 'John', surname: 'D.' } );
+let data = await SQL.query( 'users' ).set( { id: 1, name: 'John', surname: 'D.' } );
 ```
 
 Output

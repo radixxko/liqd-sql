@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const SQLError = require( '../../lib/errors.js');
-const SQL = require('../../lib/sql.js')(
+const SQL = new (require('../../lib/sql.js'))(
 {
 	mysql :
 	{
@@ -17,10 +17,10 @@ let insert, select, delete_row;
 
 it( 'Create', async() =>
 {
-	await SQL('errors').drop_table( true );
-	await SQL('tests').drop_table( true );
+	await SQL.query('errors').drop_table( true );
+	await SQL.query('tests').drop_table( true );
 
-	let errors = await SQL( {
+	let errors = await SQL.query( {
 		columns :
 		{
 			id      		: { type: 'BIGINT:UNSIGNED' },
@@ -33,7 +33,7 @@ it( 'Create', async() =>
 		}
 	}, 'errors' ).create_table( true );
 
-	let tests = await SQL( {
+	let tests = await SQL.query( {
 		columns :
 		{
 			id      		: { type: 'BIGINT:UNSIGNED', increment: true },
@@ -51,43 +51,43 @@ it( 'Create', async() =>
 it( 'Errors', async() =>
 {
   let cnt = 0;
-	let test = await SQL().execute();
+	let test = await SQL.query().execute();
 	assert.ok( test.error && test.error.code === 'EMPTY_QUERY' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL().get();
+  test = await SQL.query().get();
 	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL().get_query();
+  test = await SQL.query().get_query();
 	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL().get_all();
+  test = await SQL.query().get_all();
 	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL().get_all_query();
+  test = await SQL.query().get_all_query();
 	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-	test = await SQL( 'tests' ).where( 'id > :?', null ).get_all( 'tests.' );
+	test = await SQL.query( 'tests' ).where( 'id > :?', null ).get_all( 'tests.' );
 	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL( 'undefined' ).get();
+  test = await SQL.query( 'undefined' ).get();
 	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL( 'undefined' ).set( );
+  test = await SQL.query( 'undefined' ).set( );
 	assert.ok( !test.error , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL( 'undefined' ).set( { id: 1, name: 'John' } );
+  test = await SQL.query( 'undefined' ).set( { id: 1, name: 'John' } );
 	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL( 'undefined' ).update( { id: 1, name: 'John' } );
+  test = await SQL.query( 'undefined' ).update( { id: 1, name: 'John' } );
 	assert.ok( test.error && test.error.code === 'INVALID_ENTRY' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL( 'undefined' ).delete( { id: 1, name: 'John' } );
+  test = await SQL.query( 'undefined' ).delete( { id: 1, name: 'John' } );
 	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL( 'undefined' ).insert( { id: 1, name: 'John' } );
+  test = await SQL.query( 'undefined' ).insert( { id: 1, name: 'John' } );
 	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
-  test = await SQL( 'tests' ).where('ids = :?', 'bad').update( { id: 1, name: 'John' } );
+  test = await SQL.query( 'tests' ).where('ids = :?', 'bad').update( { id: 1, name: 'John' } );
 	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
 	//let error = new SQLError( ).get();

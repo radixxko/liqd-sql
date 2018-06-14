@@ -22,6 +22,7 @@
     "connector"
   ],
   "dependencies": {
+    "liqd-event": "^1.0.0",
     "liqd-timed-promise": "^1.2.0",
     "mysql": "^2.15.0"
   },
