@@ -9,9 +9,9 @@
 ## Table of Contents
 
 * [Installing](#installing)
-* [Usage](#usage)  
-* [Create table](#create-table)  
-* [Select](#select)  
+* [Usage](#usage)
+* [Create table](#create-table)
+* [Select](#select)
 * [Select query](#select-query)
 * [Result](#result)
 * [Join](#join)
@@ -43,12 +43,11 @@ const SQL = new (require('../../lib/sql.js'))(
 {
 	mysql :
 	{
-    host            : 'localhost',
-		user            : 'root',
-		password        : '',
-		database		    : 'test'
+		host			: 'localhost',
+		user			: 'root',
+		password	: '',
+		database	: 'test'
 	}
-})
 });
 ```
 
@@ -103,7 +102,7 @@ let data = await SQL.query( 'users' ).select_row();
 
 Output
 ```
- {
+{
 	ok            : true,
 	error         : null,
 	affected_rows : 1,
@@ -131,7 +130,7 @@ let data = await SQL.query( 'users' ).select();
 
 Output
 ```
- {
+{
 	ok            : true,
 	error         : null,
 	affected_rows : 2,
@@ -142,8 +141,8 @@ Output
 	changed_ids   : [],
 	row           : { id: 1, name: 'John', surname: 'D.', cityID: 1 },
 	rows          : [ { id: 1, name: 'John', surname: 'D.', cityID: 1 }, { id: 2, name: 'Mark', surname: 'T.', cityID: 1 } ],
- 	sql_time      : 1,
-  time          : 1,
+	sql_time      : 1,
+	time          : 1,
 	query         : 'SELECT * FROM `users`'
 };
 ```
@@ -177,7 +176,7 @@ let data = await SQL.query( 'users' ).select_query();
 
 Output
 ```
- SELECT * FROM `users`
+	SELECT * FROM `users`
 ```
 
 ## Result
@@ -185,7 +184,7 @@ Output
 ### .select_row( [columns = '*'[, data = null]] )
 
 ```
- {
+{
 	ok            : true,
 	error         : null,
 	affected_rows : 0,
@@ -196,8 +195,8 @@ Output
 	changed_ids   : [],
 	row           : null,
 	rows          : [],
- 	sql_time      : 0,
-  time          : 0,
+	sql_time      : 0,
+	time          : 0,
 	query         : ''
 };
 ```
@@ -248,7 +247,7 @@ let data = await SQL.query( 'users u' ).inner_join( 'cities c', 'u.cityID = c.id
 
 Output
 ```
- SELECT * FROM `users` `u` INNER JOIN `work` `w` ON `u`.`id` = `w`.`userID`
+	SELECT * FROM `users` `u` INNER JOIN `work` `w` ON `u`.`id` = `w`.`userID`
 ```
 
 ## Union
@@ -270,7 +269,7 @@ let data = await SQL.query( 'users' ).where( ' id > 10 AND name = :?', 'John' ).
 
 Output
 ```
- SELECT * FROM `users` WHERE `id` > 10 AND `name` = 'John'
+	SELECT * FROM `users` WHERE `id` > 10 AND `name` = 'John'
 ```
 
 ```js
@@ -279,7 +278,7 @@ let data = await SQL.query( 'users' ).where( ' id > 10 ' ).where( 'name = :?', '
 
 Output
 ```
- SELECT * FROM `users` WHERE ( `id` > 10 ) AND ( `name` = 'John' )
+	SELECT * FROM `users` WHERE ( `id` > 10 ) AND ( `name` = 'John' )
 ```
 
 ## Order by
@@ -295,7 +294,7 @@ let data = await SQL.query( 'users' ).order_by( 'name ASC, surname DESC' ).selec
 
 Output
 ```
- SELECT * FROM `users` ORDER BY `name` ASC, `surname` DESC
+	SELECT * FROM `users` ORDER BY `name` ASC, `surname` DESC
 ```
 
 
@@ -313,7 +312,7 @@ let data = await SQL.query( 'users' ).group_by( 'surname DESC' ).select_query( '
 
 Output
 ```
- SELECT * FROM `users` GROUP BY `surname`
+	SELECT * FROM `users` GROUP BY `surname`
 ```
 
 ## Having
@@ -329,7 +328,7 @@ let data = await SQL.query( 'users' ).having( 'id > 3' ).select_query( '*' );
 
 Output
 ```
- SELECT * FROM `users` HAVING id > 3
+	SELECT * FROM `users` HAVING id > 3
 ```
 
 ## Limit
@@ -359,7 +358,7 @@ let data = await SQL.query( 'users' ).limit( 15 ).offset( 15 ).select_query( '*'
 
 Output
 ```
- SELECT * FROM `users` LIMIT 15 OFFSET 15
+	SELECT * FROM `users` LIMIT 15 OFFSET 15
 ```
 
 ## Execute
@@ -372,7 +371,7 @@ let data = await SQL.query( 'SELECT * FROM users' ).execute();
 
 Output
 ```
- {
+{
 	ok            : true,
 	error         : null,
 	affected_rows : 2,
@@ -383,7 +382,7 @@ Output
 	changed_ids   : [],
 	row           : { id: 1, name: 'John', surname: 'D.', cityID: 1 },
 	rows          : [ { id: 1, name: 'John', surname: 'D.', cityID: 1 }, { id: 2, name: 'Mark', surname: 'T.', cityID: 1 } ],
- 	sql_time      : 1,
+	sql_time      : 1,
 	time          : 1,
 	query         : 'SELECT * FROM `users`'
 };
@@ -403,7 +402,7 @@ let data = await SQL.query( 'users' ).update( { id: 1, name: 'Johnson' } );
 
 Output
 ```
- {
+{
 	ok            : true,
 	error         : null,
 	affected_rows : 1,
@@ -414,8 +413,8 @@ Output
 	changed_ids   : [],
 	row           : null,
 	rows          : [],
- 	sql_time      : 1,
-  time          : 1,
+	sql_time      : 1,
+	time          : 1,
 	query         : 'UPDATE `users` SET `id` = CASE WHEN `id` = 1 THEN 1 ELSE `id` END, `name` = CASE WHEN `id` = 1 THEN 'Johnson' ELSE `name` END WHERE ( `id` IN (1) )'
 };
 ```
@@ -427,7 +426,7 @@ let data = await SQL.query( 'users' ).where( 'id = 1' ).update( { name: 'Johnson
 
 Output
 ```
- {
+{
 	ok            : true,
 	error         : null,
 	affected_rows : 1,
@@ -438,8 +437,8 @@ Output
 	changed_ids   : [],
 	row           : null,
 	rows          : [],
- 	sql_time      : 1,
-  time          : 1,
+	sql_time      : 1,
+	time          : 1,
 	query         : 'UPDATE `users` SET `name` = 'Johnson' WHERE `id` = 1 '
 };
 ```
@@ -452,7 +451,7 @@ let data = await SQL.query( 'users' ).where( 'id = 1' ).update( 'name = :?', 'Jo
 
 Output
 ```
- {
+{
 	ok            : true,
 	error         : null,
 	affected_rows : 1,
@@ -463,8 +462,8 @@ Output
 	changed_ids   : [],
 	row           : null,
 	rows          : [],
- 	sql_time      : 1,
-  time          : 1,
+	sql_time      : 1,
+	time          : 1,
 	query         : 'UPDATE `users` SET `name` = 'Johnson' WHERE `id` = 1 '
 };
 ```
@@ -482,7 +481,7 @@ let data = await SQL.query( 'users' ).insert( { id: 1, name: 'John', surname: 'D
 
 Output  
 ```
- {
+	{
 	ok            : true,
 	error         : null,
 	affected_rows : 1,
@@ -493,8 +492,8 @@ Output
 	changed_ids   : [ 1 ],
 	row           : null,
 	rows          : [],
- 	sql_time      : 1,
-  time          : 1,
+	sql_time      : 1,
+	time          : 1,
 	query         : 'INSERT INTO `users` ( id, name, surname ) VALUES ( 1, 'John', 'D.' )'
 };
 ```
@@ -505,7 +504,7 @@ let data = await SQL.query( 'users' ).insert( { id: 1, name: 'John', surname: 'D
 
 Output  
 ```
- {
+{
 	ok            : true,
 	error         : null,
 	affected_rows : 1,
@@ -516,8 +515,8 @@ Output
 	changed_ids   : [ 1 ],
 	row           : null,
 	rows          : [],
- 	sql_time      : 1,
-  time          : 1,
+	sql_time      : 1,
+	time          : 1,
 	query         : 'INSERT IGNORE INTO `users` ( id, name, surname ) VALUES ( 1, 'John', 'D.' )'
 };
 ```
@@ -534,7 +533,7 @@ let data = await SQL.query( 'users' ).set( { id: 1, name: 'John', surname: 'D.' 
 
 Output
 ```
- {
+{
 	ok            : true,
 	error         : null,
 	affected_rows : 1,
@@ -545,7 +544,7 @@ Output
 	changed_ids   : [ 1 ],
 	row           : null,
 	rows          : [],
- 	sql_time      : 1,
-  time          : 1
+	sql_time      : 1,
+	time          : 1
 };
 ```
