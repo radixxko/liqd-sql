@@ -3,13 +3,13 @@
 const assert = require('assert');
 const SQL = new (require('../../lib/sql.js'))(
 {
-	mysql :
-	{
+  mysql :
+  {
     host            : 'localhost',
-		user            : 'root',
-		password        : '',
-		database		    : 'test'
-	}
+    user            : 'root',
+    password        : '',
+    database        : 'test'
+  }
 });
 
 let insert, select, delete_row;
@@ -19,35 +19,35 @@ it( 'Create', async() =>
   await SQL.query( 'join_users').drop_table( true );
   await SQL.query( 'join_address').drop_table( true );
 
-	let join_users = await SQL.query( {
-		columns :
-		{
-			id      		: { type: 'BIGINT:UNSIGNED' },
-			name    		: { type: 'VARCHAR:255' }
-		},
-		indexes : {
-			primary : 'id',
-			unique  : [],
-			index   : []
-		}
-	}, 'join_users' ).create_table( true );
+  let join_users = await SQL.query( {
+    columns :
+    {
+      id          : { type: 'BIGINT:UNSIGNED' },
+      name        : { type: 'VARCHAR:255' }
+    },
+    indexes : {
+      primary : 'id',
+      unique  : [],
+      index   : []
+    }
+  }, 'join_users' ).create_table( true );
 
-	let join_address = await SQL.query( {
-		columns :
-		{
-			id      : { type: 'BIGINT:UNSIGNED' },
-			active 	: { type: 'TINYINT', default: 1 },
-			city    : { type: 'VARCHAR:255' }
-		},
-		indexes : {
-			primary : 'id',
-			unique  : [],
-			index   : []
-		}
-	}, 'join_address' ).create_table( true );
+  let join_address = await SQL.query( {
+    columns :
+    {
+      id      : { type: 'BIGINT:UNSIGNED' },
+      active   : { type: 'TINYINT', default: 1 },
+      city    : { type: 'VARCHAR:255' }
+    },
+    indexes : {
+      primary : 'id',
+      unique  : [],
+      index   : []
+    }
+  }, 'join_address' ).create_table( true );
 
-	await SQL.query( 'join_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' }, { id: 5, name: 'Kate' } ] );
-	await SQL.query( 'join_users' ).set( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George G' }, { id: 4, name: 'Janet J' }, { id: 5, name: 'Kate K' } ] );
+  await SQL.query( 'join_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' }, { id: 5, name: 'Kate' } ] );
+  await SQL.query( 'join_users' ).set( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George G' }, { id: 4, name: 'Janet J' }, { id: 5, name: 'Kate K' } ] );
   await SQL.query( 'join_address' ).set( [ { id: 1, city: 'City' }, { id: 2, city: 'New' }, { id: 3, city: 'Old' } ] );
 
 
@@ -55,8 +55,8 @@ it( 'Create', async() =>
 
 it( 'Join', async() =>
 {
-	let cnt = 0;
-	let join = await SQL.query( 'join_users' )
+  let cnt = 0;
+  let join = await SQL.query( 'join_users' )
     .join( 'join_address', 'join_address.id = join_users.id' )
     .where( 'join_address.id = 1' )
     .get('*');
