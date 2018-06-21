@@ -86,7 +86,7 @@ it( 'GROUP BY', async() =>
   .order_by('start DIV :? ASC', interval)
   .get_all_query('COUNT( DISTINCT street, city ) cnt, ( `start` DIV :? ) * status date, start + start alias, IF( ( start * end ) > 0, 1, 2 ), status', interval );
 
-  assert.ok( test === "SELECT COUNT( DISTINCT `street`, `city` ) `cnt`,  ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > 0,  1,  2 ),  MAX(`status`) `status` FROM `set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC" , 'GROUP BY '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
+  assert.equal( test.replace(/\s+/g,' ') , "SELECT COUNT( DISTINCT `street`, `city` ) `cnt`,  ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > 0,  1,  2 ),  MAX(`status`) `status` FROM `set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC".replace(/\s+/g,' ') , 'GROUP BY '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
 
 
   test = await SQL.query( 'join_users      js' )
