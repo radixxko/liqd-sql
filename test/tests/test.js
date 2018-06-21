@@ -76,9 +76,18 @@ it( 'GROUP BY', async() =>
   .where('label = :label AND start >= :start', { label: 'AAAA', start: 10000 })
   .group_by('start DIV :? , status', interval)
   .order_by('start DIV :? ASC', interval)
-  .get_all_query('COUNT(*) cnt, ( `start` DIV :? ) * status date, start + start alias, IF( ( start * end ) > 0, 1, 2 ), status', interval );
+  .get_all_query('COUNT( DISTINCT label ) cnt, ( `start` DIV :? ) * status date, start + start alias, IF( ( start * end ) > 0, 1, 2 ), status', interval );
 
-  assert.ok( test, "SELECT COUNT(*) `cnt`,  ( MAX( `start` ) DIV 360000 ) * `status` `date`, MAX( `start` ) + MAX( `start` ) test,  IF( MAX( `start` ) > 0,  1,  2 ),  `status` FROM `set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000, `status` ORDER BY `start` DIV 360000 ASC" , 'GROUP BY '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
+  assert.ok( test === "SELECT COUNT( DISTINCT `label` ) `cnt`,  ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > 0,  1,  2 ),  MAX(`status`) `status` FROM `set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC" , 'GROUP BY '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
+
+  test = await SQL.query( 'set_address')
+  .where('label = :label AND start >= :start', { label: 'AAAA', start: 10000 })
+  .group_by('start DIV :? , status', interval)
+  .order_by('start DIV :? ASC', interval)
+  .get_all_query('COUNT( DISTINCT street, city ) cnt, ( `start` DIV :? ) * status date, start + start alias, IF( ( start * end ) > 0, 1, 2 ), status', interval );
+
+  assert.ok( test === "SELECT COUNT( DISTINCT `street`, `city` ) `cnt`,  ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > 0,  1,  2 ),  MAX(`status`) `status` FROM `set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC" , 'GROUP BY '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
+
 
   test = await SQL.query( 'join_users      js' )
         .inner_join( SQL.query( 'join_address', 'aa' ).group_by( 'id' ).columns( 'join_address.id, COUNT(*) count, active' ), 'js.id = aa.id AND aa.active = 1' )
