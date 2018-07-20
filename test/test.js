@@ -4,15 +4,15 @@ const fs = require('fs');
 
 describe( 'Tests', ( done ) =>
 {
-  var files = fs.readdirSync( __dirname + '/tests' );
+	var files = fs.readdirSync( __dirname + '/tests' );
 
-  for( let file of files )
-  {
-    describe( file, () =>
-    {
-      require( __dirname + '/tests/' + file );
-    });
-  }
+	for( let file of files )
+	{
+		describe( file, () =>
+		{
+		require( __dirname + '/tests/' + file );
+		});
+	}
 
-  setTimeout( () => { process.exit(); }, 100000 );
+	setTimeout( () => { process.exit(); }, 100000 );
 });
