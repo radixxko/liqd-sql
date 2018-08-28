@@ -2,14 +2,15 @@
 
 const assert = require('assert');
 const SQLError = require( '../../lib/errors.js');
+const tables = require('../tables.js');
 const SQL = new (require('../../lib/sql.js'))(
 {
 	mysql :
 	{
-		host            : 'localhost',
-		user            : 'root',
-		password        : '',
-		database		    : 'test'
+		host     : 'localhost',
+		user     : 'root',
+		password : '',
+		database : 'test'
 	}
 });
 
@@ -19,33 +20,9 @@ it( 'Create', async() =>
 {
 	await SQL.query( 'errors').drop_table( true );
 	await SQL.query( 'tests').drop_table( true );
-
-	let errors = await SQL.query( {
-		columns :
-		{
-			id      		: { type: 'BIGINT:UNSIGNED' },
-			name    		: { type: 'VARCHAR:255' }
-		},
-		indexes : {
-			primary : 'id',
-			unique  : [],
-			index   : []
-		}
-	}, 'errors' ).create_table( true );
-
-	let tests = await SQL.query( {
-		columns :
-		{
-			id      		: { type: 'BIGINT:UNSIGNED', increment: true },
-			name    		: { type: 'VARCHAR:255', default: 'name' },
-			uid    			: { type: 'BIGINT', default: 'NULL', null: true }
-		},
-		indexes : {
-			primary : 'id',
-			unique  : [],
-			index   : []
-		}
-	}, 'tests' ).create_table( true );
+	
+	await SQL.query( tables['errors'], 'errors' ).create_table( true );
+	await SQL.query( tables['tests'], 'tests' ).create_table( true );
 }).timeout(100000);
 
 it( 'Errors', async() =>
@@ -79,7 +56,7 @@ it( 'Errors', async() =>
 	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
 	test = await SQL.query( 'undefined' ).update( { id: 1, name: 'John' } );
-	assert.ok( test.error && test.error.code === 'INVALID_ENTRY' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
 	test = await SQL.query( 'undefined' ).delete( { id: 1, name: 'John' } );
 	assert.ok( test.error && test.error.code === 'EREQUEST' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );

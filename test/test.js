@@ -10,7 +10,7 @@ describe( 'Tests', ( done ) =>
 	{
 		describe( file, () =>
 		{
-		require( __dirname + '/tests/' + file );
+			require( __dirname + '/tests/' + file );
 		});
 	}
 
