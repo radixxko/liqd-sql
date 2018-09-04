@@ -169,3 +169,20 @@ const config =
 		assert.ok( getError && getError.length, 'Error '+ (++cnt) +' failed ' + JSON.stringify( getError, null, '  ' ) );
 
 	}).timeout(100000);
+
+	it( 'Where as object', async() =>
+	{
+		let cnt = 0;
+		let select = await SQL.query( 'join_users' ).where( { name: 'John' }  ).group_by('name').get_all('name, COUNT(*) count');
+		assert.deepEqual( select.rows, [{ name: 'John', count: 1 }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
+
+		select = await SQL.query( 'test_users' ).where( { '!name': ['Max', 'Janet' ], surname: null }  ).get_all('name');
+		assert.deepEqual( select.rows, [{ name: 'John' },{ name: 'George' }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
+
+		select = await SQL.query( 'test_users' ).where( { 'name': ['George', 'Max' ], surname: null }  ).group_by('name').get_all('name');
+		assert.deepEqual( select.rows, [{ name: 'George' },{ name: 'Max' }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
+
+		select = await SQL.query( 'test_users' ).where( { '!name': null }  ).group_by('name').get_all('name');
+		assert.deepEqual( select.rows, [{ name: 'George' },{ name: 'Janet' },{ name: 'John' },{ name: 'Max' }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
+
+	}).timeout(100000);
