@@ -18,17 +18,21 @@ let insert, select, delete_row;
 
 it( 'Create', async() =>
 {
+	let cnt = 0;
 	await SQL.query( 'join_users').drop_table( true );
 	await SQL.query( 'join_address').drop_table( true );
 
-	let join_users = await SQL.query( tables['join_users'], 'join_users' ).create_table( true );
-	let join_address = await SQL.query( tables['join_address'], 'join_address' ).create_table( true );
+	await SQL.query( tables['join_users'], 'join_users' ).create_table( true );
+	await SQL.query( tables['join_address'], 'join_address' ).create_table( true );
 
-	await SQL.query( 'join_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' }, { id: 5, name: 'Kate' } ] );
-	await SQL.query( 'join_users' ).set( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George G' }, { id: 4, name: 'Janet J' }, { id: 5, name: 'Kate K' } ] );
-	await SQL.query( 'join_address' ).set( [ { id: 1, city: 'City' }, { id: 2, city: 'New' }, { id: 3, city: 'Old' } ] );
+	let add = await SQL.query( 'join_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' }, { id: 5, name: 'Kate' } ] );
+	assert.ok( add.ok && add.changed_rows === 5, 'Test create join '+(++cnt)+' failed ' + JSON.stringify( add, null, '  ' ) );
 
+	add = await SQL.query( 'join_users' ).set( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George G' }, { id: 4, name: 'Janet J' }, { id: 5, name: 'Kate K' } ] );
+	assert.ok( add.ok && add.changed_rows === 3, 'Test create join '+(++cnt)+' failed ' + JSON.stringify( add, null, '  ' ) );
 
+	add = await SQL.query( 'join_address' ).set( [ { id: 1, city: 'City' }, { id: 2, city: 'New' }, { id: 3, city: 'Old' } ] );
+	assert.ok( add.ok && add.changed_rows === 3, 'Test create join '+(++cnt)+' failed ' + JSON.stringify( add, null, '  ' ) );
 }).timeout(100000);
 
 it( 'Join', async() =>

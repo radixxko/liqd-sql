@@ -59,7 +59,7 @@ it( 'Update', async() =>
 	assert.ok( update.ok && update.changed_id === 2, 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) )
 
 	update = await SQL.query( 'update_users_2' ).update( { id: 1, name: 'John D.' } );
-	assert.ok( update.error && update.error.code === 'INVALID_ENTRY', 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );
+	assert.ok( update.error && update.connector_error.type === 'query', 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );
 
 	update = await SQL.query( 'update_users_3' ).where( 'name = :? ', 'John' ).update( { city: 'City' } );
 	assert.deepEqual(  update.changed_id , { name: 'John', surname: 'J' }, 'Update '+ (++cnt) +' failed ' + JSON.stringify( update, null, '  ' ) );

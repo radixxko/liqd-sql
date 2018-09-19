@@ -28,7 +28,7 @@ module.exports =
 			index   : []
 		}
 	},
-	errors :
+	errors_list :
 	{
 		columns :
 		{
