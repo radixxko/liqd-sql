@@ -18,6 +18,23 @@ it( 'Missing config', async() =>
 	assert.ok( error && error.toString() === 'Error: missing database config' , 'Test missing config 1 failed ' );
 }).timeout(100000);
 
+it( 'Bad credentials', async() =>
+{
+	const SQL_2 = new (require('../../lib/sql.js'))(
+	{
+		mysql :
+		{
+			host     : 'localhost',
+			user     : 'roots',
+			password : '',
+			database : 'test'
+		}
+	});
+
+	let test = await SQL_2.query( 'errors_list').drop_table( true );
+	assert.ok( test && test.connector_error.type === 'connect' , 'Test bad credentials 1 failed ' );
+}).timeout(100000);
+
 const SQL = new (require('../../lib/sql.js'))(
 {
 	mysql :

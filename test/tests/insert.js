@@ -43,6 +43,8 @@ it( 'Insert', async() =>
 
 	insert = await SQL.query( 'insert_users_2' ).insert( [ { id: 1, name: 'John', surname: 'J.' }, { id: 2, name: 'Max', surname: 'M.' }, { id: 3, name: 'George', surname: 'G.' }, { id: 4, name: 'Janet', surname: 'J.' }, { id: 5, name: 'Kate', surname: 'K.' } ] );
 	assert.ok( insert.ok && insert.affected_rows === 5 , 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
+	assert.deepEqual(  insert.changed_id , { id: 1, name: 'John' }, 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
+	assert.deepEqual(  insert.changed_ids , [{ id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' }, { id: 5, name: 'Kate' }], 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
 
 }).timeout(10000000);
 
