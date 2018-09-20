@@ -22,8 +22,10 @@ it( 'Create', async() =>
 {
 	await SQL.query('insert_users').drop_table( true );
 	await SQL.query('insert_users_2').drop_table( true );
+	await SQL.query('insert_users_3').drop_table( true );
 	await SQL.query( tables['insert_users'], 'insert_users' ).create_table( true );
 	await SQL.query( tables['insert_users_2'], 'insert_users_2' ).create_table( true );
+	await SQL.query( tables['insert_users_3'], 'insert_users_3' ).create_table( true );
 }).timeout(100000);
 
 it( 'Insert', async() =>
@@ -46,6 +48,8 @@ it( 'Insert', async() =>
 	assert.deepEqual(  insert.changed_id , { id: 1, name: 'John' }, 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
 	assert.deepEqual(  insert.changed_ids , [{ id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' }, { id: 5, name: 'Kate' }], 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
 
+	insert = await SQL.query( 'insert_users_3' ).insert( [ { id: 123456, name: 'John' } ] );
+	assert.ok( insert.ok && insert.inserted_id === 123456, 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
 }).timeout(10000000);
 
 it( 'Check', async() =>

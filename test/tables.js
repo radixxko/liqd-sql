@@ -88,6 +88,19 @@ module.exports =
 			unique  : []
 		}
 	},
+	insert_users_3 :
+	{
+		columns :
+		{
+			id      : { type: 'BIGINT:UNSIGNED' },
+			name    : { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : []
+		}
+	},
 	join_users :
 	{
 		columns :

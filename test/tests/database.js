@@ -22,6 +22,6 @@ it( 'Create', async() =>
 	let cnt = 0, database = 'test_1';
 	let test = await SQL.query().create_database( database, tables, { result_type: 'array' } );
 
-	assert.ok( test.create && test.create.length === 21 , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+	assert.ok( test.create && test.create.length === 22 , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
 }).timeout(100000);
