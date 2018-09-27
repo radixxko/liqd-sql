@@ -177,6 +177,21 @@ module.exports =
 			index   : [ ]
 		}
 	},
+	set_names :
+	{
+		columns :
+		{
+			id          : { type: 'BIGINT:UNSIGNED' },
+			name        : { type: 'VARCHAR:255' },
+			surname     : { type: 'VARCHAR:55', null: true }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : 'name',
+			index   : []
+		}
+	},
 	table_users :
 	{
 		columns :

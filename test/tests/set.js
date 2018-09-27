@@ -21,10 +21,12 @@ it( 'Create', async() =>
 	await SQL.query('set_users').drop_table( true );
 	await SQL.query('set_address').drop_table( true );
 	await SQL.query('set_phones').drop_table( true );
+	await SQL.query('set_names').drop_table( true );
 
 	await SQL.query( tables['set_users'], 'set_users' ).create_table( true );
 	await SQL.query( tables['set_address'], 'set_address' ).create_table( true );
 	await SQL.query( tables['set_phones'], 'set_phones' ).create_table( true );
+	await SQL.query( tables['set_names'], 'set_names' ).create_table( true );
 }).timeout(100000);
 
 it( 'Set', async() =>
@@ -60,6 +62,13 @@ it( 'Set', async() =>
 	set = await SQL.query( 'set_address' ).set( [ { addressID: 3, name: 'Out', '?description': { '&Values': '\'Main\'' } }, { addressID: 2, name: 'Office', '?description': { 'Main': 'Maintance' } } ] );
 	assert.ok( set.ok && set.affected_rows === 2, 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, ' ' ) );
 
+	set = await SQL.query( 'set_names' ).set( { id: 1, name: 'John' } );
+	set = await SQL.query( 'set_names' ).set( { id: 10, name: 'John', surname: '' } );
+	assert.ok( set.ok && set.changed_rows === 1, 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) )
+
+	set = await SQL.query( 'set_users' ).set( { id: 40, name: 'Janet J.' }, { name: 'Kate K.', surname: 'K.' } );
+	assert.ok( set.ok && set.changed_rows === 1, 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) )
+
 	set = await SQL.query( 'set_phones' ).set( [ { userID: 3, phone: '12345' } ] );
 	assert.ok( set.ok && set.affected_rows === 1 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, ' ' ) );
 
@@ -75,8 +84,8 @@ it( 'Check', async() =>
 	assert.deepEqual( check.rows , [  { id: 1, name: 'John D.', description: null, surname: null},
 		{ id: 2, name: 'Max M.', description: null, surname: null},
 		{ id: 3, name: 'George G.', description: '[object Object]', surname: null},
-		{ id: 4, name: 'Janet J.', description: null, surname: null },
-		{ id: 5, name: 'Kate K.', description: null, surname: null } ], 'Check failed ' + JSON.stringify( check, null, '  ' ) );
+		{ id: 5, name: 'Kate K.', description: null, surname: null },
+		{ id: 40, name: 'Janet J.', description: null, surname: null } ], 'Check failed ' + JSON.stringify( check, null, '  ' ) );
 
 	check = await SQL.query( 'set_address' ).get_all( 'id,addressID, name, description' );
 
