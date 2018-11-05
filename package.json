@@ -1,7 +1,7 @@
 {
   "name": "liqd-sql",
   "description": "Node.JS SQL connector for MySQL, SQL Server and Oracle Databases",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "author": "radixxko",
   "license": "MIT",
   "main": "lib/sql.js",
@@ -22,8 +22,8 @@
     "connector"
   ],
   "dependencies": {
-    "liqd-event": "^1.0.0",
-    "liqd-timed-promise": "^1.2.0",
+    "liqd-event": "^1.0.1",
+    "liqd-timed-promise": "^1.2.3",
     "mssql": "^4.1.0",
     "mysql": "^2.16.0"
   },
