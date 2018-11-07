@@ -9,7 +9,7 @@ it( 'Create', async() =>
 	let cnt = 0, database = 'test_1';
 
 	let test = await SQL.query().create_database( database, config.tables, { result_type: 'array' } );
-	assert.ok( test.create && test.create.length === 24 , 'Test error '+( ++cnt )+' failed '+ '. Length '+ test.create.length + '. ' + JSON.stringify( test, null, '  ' ) );
+	assert.ok( test.create && test.create.length === 25 , 'Test error '+( ++cnt )+' failed '+ '. Length '+ test.create.length + '. ' + JSON.stringify( test, null, '  ' ) );
 
 }).timeout(100000);
 

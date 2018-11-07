@@ -192,6 +192,20 @@ module.exports =
 			index   : []
 		}
 	},
+	set_test :
+	{
+		columns :
+		{
+			name : { type: 'VARCHAR:255', default: 'name' },
+			uid  : { type: 'BIGINT', default: 'NULL', null: true }
+		},
+		indexes :
+		{
+			primary : '',
+			unique  : ['name'],
+			index   : []
+		}
+	},
 	table_users :
 	{
 		columns :

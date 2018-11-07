@@ -12,11 +12,13 @@ it( 'Create', async() =>
 	await SQL.query('set_address').drop_table( true );
 	await SQL.query('set_phones').drop_table( true );
 	await SQL.query('set_names').drop_table( true );
+	await SQL.query('set_test').drop_table( true );
 
 	await SQL.query( config.tables['set_users'], 'set_users' ).create_table( true );
 	await SQL.query( config.tables['set_address'], 'set_address' ).create_table( true );
 	await SQL.query( config.tables['set_phones'], 'set_phones' ).create_table( true );
 	await SQL.query( config.tables['set_names'], 'set_names' ).create_table( true );
+	await SQL.query( config.tables['set_test'], 'set_test' ).create_table( true );
 }).timeout(100000);
 
 it( 'Set', async() =>
@@ -65,7 +67,12 @@ it( 'Set', async() =>
 	set = await SQL.query( 'set_address' ).where( 'name = :?', 'Home' ).set( [ { id: 1, city: 'City' }, { id: 2, city: 'City' }, { id: 4, city: 'City' }, { id: 5, city: 'City' } ] );
 	assert.ok( set.ok && set.affected_rows === 2 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, ' ' ) );
 
-	//test na set ako data_type
+	set = await SQL.query( 'set_test' ).set( [ { name: 'John', uid: '123' } ] );
+	assert.ok( set.ok && set.affected_rows === 1 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, ' ' ) );
+
+	set = await SQL.query( 'set_test' ).set( [ { name: 'John', uid: '456' } ] );
+	assert.ok( set.ok && set.affected_rows === 1 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, ' ' ) );
+
 }).timeout(100000);
 
 
