@@ -2,19 +2,7 @@
 
 const assert = require('assert');
 const TimedPromise = require('liqd-timed-promise');
-const tables = require('../tables.js');
-const SQL = new (require('../../lib/sql.js'))(
-{
-	mysql :
-	{
-		host     : 'localhost',
-		user     : 'root',
-		password : '',
-		database : 'test'
-	}
-});
-
-let insert, select, delete_row;
+const SQL = new (require('../../lib/sql.js'))( config );
 
 it( 'Create', async() =>
 {
@@ -22,9 +10,9 @@ it( 'Create', async() =>
 	await SQL.query('update_users_2').drop_table( true );
 	await SQL.query('update_users_3').drop_table( true );
 
-	await SQL.query( tables['update_users'], 'update_users' ).create_table( true );
-	await SQL.query( tables['update_users_2'], 'update_users_2' ).create_table( true );
-	await SQL.query( tables['update_users_3'], 'update_users_3' ).create_table( true );
+	await SQL.query( config.tables['update_users'], 'update_users' ).create_table( true );
+	await SQL.query( config.tables['update_users_2'], 'update_users_2' ).create_table( true );
+	await SQL.query( config.tables['update_users_3'], 'update_users_3' ).create_table( true );
 
 	await SQL.query( 'update_users' ).insert( [ { id: 1, uid: 1, name: 'John' }, { id: 2, uid: 2, name: 'Max' }, { id: 3, uid: 3, name: 'George' }, { id: 4, uid: 4, name: 'Janet' }, { id: 5, uid: 5, name: 'Kate' }, { id: 6, uid: 6, name: 'Tomas' } ] );
 	await SQL.query( 'update_users_2' ).insert( [ { id: 1, 'u-id': 1, name: 'John' }, { id: 2, 'u-id': 2, name: 'Max' }, { id: 3, 'u-id': 3, name: 'George' }, { id: 4, 'u-id': 4, name: 'Janet' }, { id: 5, 'u-id': 5, name: 'Kate' }, { id: 6, 'u-id': 6, name: 'Tomas' } ] );
@@ -72,7 +60,7 @@ it( 'Update', async() =>
 
 it( 'Check', async() =>
 {
-	let check = await SQL.query( 'update_users' ).get_all();
+	let check = await SQL.query( 'update_users' ).order_by( 'id ASC' ).get_all();
 
 	assert.deepEqual( check.rows , [  { id: 1, uid: 1, name: 'JOHN D.'},
 		{ id: 2, uid: 2, name: 'Max M. M.'},

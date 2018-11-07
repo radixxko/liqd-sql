@@ -1,36 +1,8 @@
 'use strict';
 
-const connector_type = 'mysql'; //, 'mssql'
 const assert = require('assert');
 const TimedPromise = require('liqd-timed-promise');
-const tables = require('../tables.js');
-const SQLError = require( '../../lib/errors.js');
-const config =
-{
-	mysql :
-	{
-		mysql :
-		{
-			host     : 'localhost',
-			user     : 'root',
-			password : '',
-			database : 'test'
-		}
-	},
-	mssql :
-	{
-		mssql :
-		{
-			host     : 'localhost',
-			user     : 'root',
-			password : '',
-			database : 'test'
-		}
-	}
-};
-
-
-let SQL = new (require('../../lib/sql.js'))( config[ connector_type ] );
+let SQL = new (require('../../lib/sql.js'))( config );
 
 SQL.on( 'query', (query) =>
 {
@@ -57,8 +29,8 @@ it( 'Create', async() =>
 	await SQL.query( 'join_users').drop_table( true );
 	await SQL.query( 'join_address').drop_table( true );
 
-	let join_users = await SQL.query( tables['join_users'], 'join_users' ).create_table( true );
-	let join_address = await SQL.query( tables['join_address'], 'join_address' ).create_table( true );
+	let join_users = await SQL.query( config.tables['join_users'], 'join_users' ).create_table( true );
+	let join_address = await SQL.query( config.tables['join_address'], 'join_address' ).create_table( true );
 
 	await SQL.query( 'join_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George G' }, { id: 4, name: 'Janet J' }, { id: 5, name: 'Kate K' } ] );
 	await SQL.query( 'join_address' ).insert( [ { id: 1, city: 'City' }, { id: 2, city: 'New' }, { id: 3, city: 'Old' } ] );
@@ -128,7 +100,7 @@ it( 'GROUP BY', async() =>
 it( 'Create', async() =>
 {
 	await SQL.query('test_users').drop_table( true );
-	let test_users = await SQL.query( tables['test_users'], 'test_users' ).create_table( true );
+	let test_users = await SQL.query( config.tables['test_users'], 'test_users' ).create_table( true );
 	await SQL.query( 'test_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' }, { name: 'Janet' }, { name: 'Janet' }, { name: 'Max' }, { name: 'Janet' } ] );
 
 }).timeout(100000);
@@ -181,6 +153,7 @@ it( 'Select', async() =>
 
 it( 'Errors', async() =>
 {
+	let SQLError = require( '../../lib/errors.js');
 	let cnt = 0;
 	let getError = new SQLError( 'UNKNOWN_ERROR_CODE' ).get();
 	assert.ok( getError && getError.full === 'UNKNOWN_ERROR_CODE', 'Error '+ (++cnt) +' failed ' + JSON.stringify( getError, null, '  ' ) );
@@ -202,7 +175,26 @@ it( 'Where as object', async() =>
 	select = await SQL.query( 'test_users' ).where( { 'name': ['George', 'Max' ], surname: null }  ).group_by('name').get_all('name');
 	assert.deepEqual( select.rows, [{ name: 'George' },{ name: 'Max' }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
 
-	select = await SQL.query( 'test_users' ).where( { '!name': null }  ).group_by('name').get_all('name');
+	select = await SQL.query( 'test_users' ).where( { '!name': null }  ).group_by('name').order_by('name ASC').get_all('name');
 	assert.deepEqual( select.rows, [{ name: 'George' },{ name: 'Janet' },{ name: 'John' },{ name: 'Max' }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
+
+}).timeout(100000);
+
+it( 'CONCAT', async() =>
+{
+	let cnt = 0;
+	let select = await SQL.query( 'join_users').get('id, CONCAT( id , :separator, name ) alias', { separator: '_' } );
+	assert.deepEqual( select.rows, [{ id: 1, alias: '1_John' }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
+
+	select = await SQL.query( 'join_users').where('( id = 1 AND CONCAT( id , :separator, name ) = :string )', { string: '1_John', separator : '_'  }).get('id, CONCAT( id , :separator, name ) alias, CONCAT( id , :separator, name ) alias2', { separator: '_' } );
+	assert.deepEqual( select.rows, [{ id: 1, alias: '1_John', alias2: '1_John' }] , 'CONCAT '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
+
+}).timeout(100000);
+
+it( 'IF', async() =>
+{
+	let cnt = 0;
+	let select = await SQL.query( 'join_users').where( 'CONCAT( id , :separator, name ) = :string', { string: '1_John', separator : '_'  } ).get('id, IF( id = 1, :text1, IF( id = 2, :text2, :text3 ) ) position', { text1: 'first', text2: 'second', text3: 'next', separator: '_' } );
+	assert.deepEqual( select.rows, [{ id: 1, position: 'first' }] , 'IF '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
 
 }).timeout(100000);

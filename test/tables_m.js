@@ -1,5 +1,19 @@
 module.exports =
 {
+	create_table :
+	{
+		columns :
+		{
+			id   : { type: 'BIGINT:UNSIGNED' },
+			name : { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
 	create_user :
 	{
 		columns :

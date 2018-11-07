@@ -1,5 +1,17 @@
 'use strict';
 
+global.config = {
+	mysql :
+	{
+		host     : 'localhost',
+		user     : 'root',
+		password : '',
+		database : 'test'
+	},
+	tables : require('./tables.js'),
+	connector : 'mysql'
+};
+
 const fs = require('fs');
 
 describe( 'Tests', ( done ) =>

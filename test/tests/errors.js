@@ -1,60 +1,64 @@
 'use strict';
 
 const assert = require('assert');
-const SQLError = require( '../../lib/errors.js');
-const tables = require('../tables.js')
 
 it( 'Missing config', async() =>
 {
 	let error = null;
 	try
 	{
-		const SQL_1 = new (require('../../lib/sql.js'))(
-		{
-		});
+		const SQL_1 = new (require('../../lib/sql.js'))( {} );
 	}
 	catch(err){ error = err; };
 
-	assert.ok( error && error.toString() === 'Error: missing database config' , 'Test missing config 1 failed ' );
+	assert.ok( error && error.toString() === 'Error: missing config' , 'Test missing config 1 failed ' );
+}).timeout(100000);
+
+it( 'Missing database config', async() =>
+{
+	let error = null;
+	try
+	{
+		const SQL_2 = new (require('../../lib/sql.js'))( { connector: config.connector } );
+	}
+	catch(err){ error = err; };
+
+	assert.ok( error && error.toString() === 'Error: missing database config' , 'Test missing database config 1 failed ' );
 }).timeout(100000);
 
 it( 'Bad credentials', async() =>
 {
-	const SQL_2 = new (require('../../lib/sql.js'))(
-	{
-		mysql :
-		{
-			host     : 'localhost',
-			user     : 'roots',
-			password : '',
-			database : 'test'
-		}
-	});
+	let error = null;
 
-	let test = await SQL_2.query( 'errors_list').drop_table( true );
-	assert.ok( test && test.connector_error.type === 'connect' , 'Test bad credentials 1 failed ' );
+	try
+	{
+		const SQL_2 = new (require('../../lib/sql.js'))(
+		{
+			mysql :
+			{
+				host     : 'localhost',
+				user     : 'roots',
+				password : '',
+				database : 'test'
+			}
+		});
+
+		let test = await SQL_2.query( 'errors_list').drop_table( true );
+
+		assert.ok( test && test.connector_error.type === 'connect' , 'Test bad credentials 1 failed ' );
+	}
+	catch(err){ error = err; };
 }).timeout(100000);
 
-const SQL = new (require('../../lib/sql.js'))(
-{
-	mysql :
-	{
-		host     : 'localhost',
-		user     : 'root',
-		password : '',
-		database : 'test'
-	}
-});
-
-let insert, select, delete_row;
+const SQL = new (require('../../lib/sql.js'))( config );
 
 it( 'Create', async() =>
 {
 	await SQL.query( 'errors_list').drop_table( true );
 	await SQL.query( 'tests').drop_table( true );
 
-	await SQL.query( tables['errors_list'], 'errors_list' ).create_table( true );
-	await SQL.query( tables['tests'], 'tests' ).create_table( true );
+	await SQL.query( config.tables['errors_list'], 'errors_list' ).create_table( true );
+	await SQL.query( config.tables['tests'], 'tests' ).create_table( true );
 }).timeout(100000);
 
 it( 'Errors', async() =>

@@ -2,16 +2,7 @@
 
 const assert = require('assert');
 const TimedPromise = require('liqd-timed-promise');
-const SQL = new (require('../../lib/sql.js'))(
-{
-	mysql :
-	{
-		host     : 'localhost',
-		user     : 'root',
-		password : '',
-		database : 'test'
-	}
-});
+const SQL = new (require('../../lib/sql.js'))( config );
 
 let insert, select, delete_row;
 

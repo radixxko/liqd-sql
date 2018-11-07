@@ -325,5 +325,18 @@ module.exports =
 			unique  : [ 'name,surname' ],
 			index   : []
 		}
+	},
+	users_table :
+	{
+		columns :
+		{
+			id    : { type: 'BIGINT:UNSIGNED', increment: true },
+			name  : { type: 'VARCHAR:255' }
+		},
+		indexes : {
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
 	}
 };

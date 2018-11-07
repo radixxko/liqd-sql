@@ -2,36 +2,24 @@
 
 const assert = require('assert');
 const TimedPromise = require('liqd-timed-promise');
-const tables = require('../tables.js');
+const SQL = new (require('../../lib/sql.js'))( config );
 
-const SQL = new (require('../../lib/sql.js'))(
-{
-	mysql :
-	{
-		host     : 'localhost',
-		user     : 'root',
-		password : '',
-		database : 'test'
-
-	}
-});
-
-let insert, select, delete_row;
+let insert;
 
 it( 'Create', async() =>
 {
 	await SQL.query('insert_users').drop_table( true );
 	await SQL.query('insert_users_2').drop_table( true );
 	await SQL.query('insert_users_3').drop_table( true );
-	await SQL.query( tables['insert_users'], 'insert_users' ).create_table( true );
-	await SQL.query( tables['insert_users_2'], 'insert_users_2' ).create_table( true );
-	await SQL.query( tables['insert_users_3'], 'insert_users_3' ).create_table( true );
+	await SQL.query( config.tables['insert_users'], 'insert_users' ).create_table( true );
+	await SQL.query( config.tables['insert_users_2'], 'insert_users_2' ).create_table( true );
+	await SQL.query( config.tables['insert_users_3'], 'insert_users_3' ).create_table( true );
 }).timeout(100000);
 
 it( 'Insert', async() =>
 {
 	let cnt = 0;
-	let insert = await SQL.query( ).insert( [ { name: 'John' }, { name: 'Max' } ] );
+	insert = await SQL.query( ).insert( [ { name: 'John' }, { name: 'Max' } ] );
 	assert.ok( insert.error && insert.error.code === 'UNDEFINED_TABLE', 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
 
 	insert = await SQL.query( 'insert_users' ).insert( );
@@ -50,6 +38,7 @@ it( 'Insert', async() =>
 
 	insert = await SQL.query( 'insert_users_3' ).insert( [ { id: 123456, name: 'John' } ] );
 	assert.ok( insert.ok && insert.inserted_id === 123456, 'Insert '+ (++cnt) +' failed ' + JSON.stringify( insert, null, '  ' ) );
+
 }).timeout(10000000);
 
 it( 'Check', async() =>

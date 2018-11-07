@@ -2,18 +2,7 @@
 
 const assert = require('assert');
 const TimedPromise = require('liqd-timed-promise');
-const tables = require('../tables.js');
-const SQL = new (require('../../lib/sql.js'))(
-{
-	mysql :
-	{
-		host     : 'localhost',
-		user     : 'root',
-		password : '',
-		database : 'test'
-	},
-	tables : tables
-});
+const SQL = new (require('../../lib/sql.js'))( config );
 
 let insert, select, delete_row;
 
@@ -23,11 +12,9 @@ it( 'Create', async() =>
 	await SQL.query( 'table_address' ).drop_table( true );
 	await SQL.query( 'table_cities' ).drop_table( true );
 
-	let table_users = await SQL.query( tables[ 'table_users' ], 'table_users' ).create_table( true );
-
-	let table_address = await SQL.query( tables[ 'table_address' ], 'table_address' ).create_table( true );
-
-	let table_cities = await SQL.query( tables[ 'table_cities' ], 'table_cities' ).create_table( true );
+	let table_users = await SQL.query( config.tables[ 'table_users' ], 'table_users' ).create_table( true );
+	let table_address = await SQL.query( config.tables[ 'table_address' ], 'table_address' ).create_table( true );
+	let table_cities = await SQL.query( config.tables[ 'table_cities' ], 'table_cities' ).create_table( true );
 
 	await SQL.query( 'table_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' } ] );
 	await SQL.query( 'table_address' ).insert( [ { name: 'John', city: 'City' }, { name: 'Max', city: 'Paradise' } ] );
@@ -55,7 +42,7 @@ it( 'Test', async() =>
 
 it( 'Check', async() =>
 {
-	let check = await SQL.query( 'table_users' ).get_all( 'id, name, surname' );
+	let check = await SQL.query( 'table_users' ).order_by('id ASC').get_all( 'id, name, surname' );
 
 	assert.deepEqual( check.rows , [  { id: 1, name: 'John D.', surname: 'Doe'},
 		{ id: 2, name: 'Max', surname: 'M.'},
