@@ -32,16 +32,10 @@ it( 'Bad credentials', async() =>
 
 	try
 	{
-		const SQL_2 = new (require('../../lib/sql.js'))(
-		{
-			mysql :
-			{
-				host     : 'localhost',
-				user     : 'roots',
-				password : '',
-				database : 'test'
-			}
-		});
+		let bad_config = config;
+		bad_config[ config.connector ].user += 's';
+
+		const SQL_2 = new (require('../../lib/sql.js'))({ bad_config });
 
 		let test = await SQL_2.query( 'errors_list').drop_table( true );
 
