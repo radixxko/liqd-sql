@@ -13,12 +13,14 @@ it( 'Create', async() =>
 	await SQL.query('set_phones').drop_table( true );
 	await SQL.query('set_names').drop_table( true );
 	await SQL.query('set_test').drop_table( true );
+	await SQL.query('set_numbers').drop_table( true );
 
 	await SQL.query( config.tables['set_users'], 'set_users' ).create_table( true );
 	await SQL.query( config.tables['set_address'], 'set_address' ).create_table( true );
 	await SQL.query( config.tables['set_phones'], 'set_phones' ).create_table( true );
 	await SQL.query( config.tables['set_names'], 'set_names' ).create_table( true );
 	await SQL.query( config.tables['set_test'], 'set_test' ).create_table( true );
+	await SQL.query( config.tables['set_numbers'], 'set_numbers' ).create_table( true );
 }).timeout(100000);
 
 it( 'Set', async() =>
@@ -36,6 +38,7 @@ it( 'Set', async() =>
 
 	set = await SQL.query( 'set_users' ).set( [{ id: 1, name: 'John D.' }, { id: 2, name: 'Max M.' }, { id: 3, name: 'George G.', description: { test: 'ok' } } ] );
 	assert.deepEqual( set.inserted_ids, [ 2,3 ], 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, ' ' ) );
+	assert.deepEqual( set.changed_ids, [ 2,3 ], 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, ' ' ) );
 
 	//set = await SQL.query( 'set_users' ).set( [ {  name: 'Janet J.', description: null }, { name: 'Kate K.' } ] );
 	//assert.deepEqual( set.inserted_ids, [ 4,5 ], 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, '  ' ) );
@@ -73,6 +76,13 @@ it( 'Set', async() =>
 	set = await SQL.query( 'set_test' ).set( [ { name: 'John', uid: '456' } ] );
 	assert.ok( set.ok && set.affected_rows === 1 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, ' ' ) );
 
+	set = await SQL.query( 'set_numbers' ).set( [ { id: '5354826364991516935', uid: '11160279303404754946' } ] );
+	assert.ok( set.ok && set.affected_rows === 1 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, ' ' ) );
+
+	set = await SQL.query( 'set_numbers' ).set( [ { id: '5354826364991516935', uid: '11160279303404754947' } ] );
+
+	assert.ok( set.ok && set.affected_rows === 1 , 'Set '+ (++cnt) +' failed ' + JSON.stringify( set, null, ' ' ) );
+
 }).timeout(100000);
 
 
@@ -83,7 +93,7 @@ it( 'Check', async() =>
 
 	assert.deepEqual( check.rows , [  { id: 1, name: 'John D.', description: null, surname: null},
 		{ id: 2, name: 'Max M.', description: null, surname: null},
-		{ id: 3, name: 'George G.', description: '[object Object]', surname: null},
+		{ id: 3, name: 'George G.', description: '{\"test\":\"ok\"}', surname: null},
 	//	{ id: 4, name: 'Janet J.', description: null, surname: null },
 	//	{ id: 5, name: 'Kate K.', description: null, surname: null },
 	//	{ id: 40, name: 'Alex A.', description: null, surname: null }

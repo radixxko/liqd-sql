@@ -192,6 +192,21 @@ module.exports =
 			index   : []
 		}
 	},
+	set_numbers :
+	{
+		columns :
+		{
+			id          : { type: 'BIGINT:UNSIGNED' },
+			uid         : { type: 'BIGINT:UNSIGNED', default: 0 },
+			value    	: { type: 'DECIMAL:12,9', default: 0 }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
 	set_test :
 	{
 		columns :
