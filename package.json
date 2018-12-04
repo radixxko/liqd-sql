@@ -1,7 +1,7 @@
 {
   "name": "liqd-sql",
   "description": "Node.JS SQL connector for MySQL, SQL Server and Oracle Databases",
-  "version": "1.4.24",
+  "version": "1.4.25",
   "author": "radixxko",
   "license": "MIT",
   "main": "lib/sql.js",
