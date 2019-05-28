@@ -6,7 +6,7 @@ node_js:
 services:
   - mysql
 before_install:
-  - mysql -e 'CREATE DATABASE test;'
+  - mysql -e 'CREATE DATABASE db0;'
 script:
   - npm test
 after_success:
