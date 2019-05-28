@@ -52,5 +52,5 @@ describe( 'Tests', ( done ) =>
 		});
 	}
 
-	setTimeout( () => { process.exit(); }, 10000000 );
+	setTimeout( () => { process.exit(); }, 100000 );
 });
