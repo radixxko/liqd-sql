@@ -39,7 +39,7 @@ module.exports =
 		{
 			primary : 'id',
 			unique  : [],
-			index   : ['name']
+			index   : []
 		}
 	},
 	errors_list :
@@ -52,7 +52,7 @@ module.exports =
 		indexes :
 		{
 			primary : 'id',
-			unique  : ['id,name'],
+			unique  : ['name'],
 			index   : []
 		}
 	},
@@ -125,7 +125,7 @@ module.exports =
 		indexes :
 		{
 			primary : 'id',
-			unique  : ['city'],
+			unique  : ['active','city'],
 			index   : []
 		}
 	},
@@ -142,8 +142,8 @@ module.exports =
 		indexes :
 		{
 			primary : 'id',
-			unique  : 'name',
-			index   : [ 'surname' ]
+			unique  : [],
+			index   : []
 		}
 	},
 	set_address :
@@ -180,15 +180,15 @@ module.exports =
 	{
 		columns :
 		{
-			id      : { type: 'BIGINT:UNSIGNED', increment: true },
+			id      : { type: 'BIGINT:UNSIGNED' },
 			name    : { type: 'VARCHAR:255' },
 			surname : { type: 'VARCHAR:255', null: true, default: 'NULL' }
 		},
 		indexes :
 		{
-			primary : 'id',
-			unique  : 'name',
-			index   : [ 'surname' ]
+			primary : 'surname',
+			unique  : 'id',
+			index   : [ 'name' ]
 		}
 	},
 	table_address :

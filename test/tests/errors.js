@@ -51,8 +51,8 @@ it( 'Create', async() =>
 	await SQL.query( 'errors_list').drop_table( true );
 	await SQL.query( 'tests').drop_table( true );
 
-	await SQL.query( config.tables['errors_list'], 'errors_list' ).create_table( true );
-	await SQL.query( config.tables['tests'], 'tests' ).create_table( true );
+	await SQL.query( config.all_tables['errors_list'], 'errors_list' ).create_table( true );
+	await SQL.query( config.all_tables['tests'], 'tests' ).create_table( true );
 }).timeout(100000);
 
 it( 'Errors', async() =>
@@ -61,6 +61,9 @@ it( 'Errors', async() =>
 	let test = await SQL.query().execute();
 	assert.ok( test.error && test.error.code === 'EMPTY_QUERY' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
+	test = await SQL.query().where('id < 2').delete();
+	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+
 	test = await SQL.query().get();
 	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
@@ -68,6 +71,9 @@ it( 'Errors', async() =>
 	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
 	test = await SQL.query().get_all();
+	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+
+	test = await SQL.query().get_union();
 	assert.ok( test.error && test.error.code === 'UNDEFINED_TABLE' , 'Test error '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
 	test = await SQL.query().get_all_query();

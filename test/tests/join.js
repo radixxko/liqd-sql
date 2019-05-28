@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const SQL = new (require('../../lib/sql.js'))( config );
+let tables = require('./../all_tables.js');
 
 it( 'Create', async() =>
 {
@@ -9,8 +10,8 @@ it( 'Create', async() =>
 	await SQL.query( 'join_users').drop_table( true );
 	await SQL.query( 'join_address').drop_table( true );
 
-	await SQL.query( config.tables['join_users'], 'join_users' ).create_table( true );
-	await SQL.query( config.tables['join_address'], 'join_address' ).create_table( true );
+	await SQL.query( tables['join_users'], 'join_users' ).create_table( true );
+	await SQL.query( tables['join_address'], 'join_address' ).create_table( true );
 
 	let add = await SQL.query( 'join_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George' }, { id: 4, name: 'Janet' }, { id: 5, name: 'Kate' } ] );
 	assert.ok( add.ok && add.changed_rows === 5, 'Test create join '+(++cnt)+' failed ' + JSON.stringify( add, null, '  ' ) );
@@ -35,11 +36,12 @@ it( 'Join', async() =>
 	join = await SQL.query( 'join_users js' )
 		.join( 'join_address ja', 'js.id = ja.id AND ja.active = 1' )
 		.get_all('*');
-	assert.deepEqual( join.rows, [ { id: 1, name: 'John', active: 1, city: 'City' },
+
+	let assert_check = await config.compare_array( join.rows, [ { id: 1, name: 'John', active: 1, city: 'City' },
 	{ id: 2, name: 'Max', active: 1, city: 'New' },
 	{ id: 3, name: 'George G', active: 1, city: 'Old' },
 	{ id: null, name: 'Janet J', active: null, city: null },
-	{ id: null, name: 'Kate K', active: null, city: null } ], 'Test join '+(++cnt)+' failed ' + JSON.stringify( join, null, '  ' ) );
+	{ id: null, name: 'Kate K', active: null, city: null } ], ++cnt, join, 'Join check' );
 
 	join = await SQL.query( 'join_users js' )
 		.inner_join( 'join_address ja', 'js.id = ja.id AND ja.active = 1' )
@@ -48,5 +50,19 @@ it( 'Join', async() =>
 	{ id: 2, name: 'Max', active: 1, city: 'New' },
 	{ id: 3, name: 'George G', active: 1, city: 'Old' } ], 'Test join '+(++cnt)+' failed ' + JSON.stringify( join, null, '  ' ) );
 
+	join = await SQL.query( 'join_users js' )
+		.inner_join( await SQL.query( 'join_address' ).where( 'active = 1' ).get_all_query( 'id, active, city', null, 'ja' ), 'js.id = ja.id' )
+		.get_all('js.*, ja.*');
+	assert.deepEqual( join.rows, [ { id: 1, name: 'John', active: 1, city: 'City' },
+	{ id: 2, name: 'Max', active: 1, city: 'New' },
+	{ id: 3, name: 'George G', active: 1, city: 'Old' } ], 'Test join '+(++cnt)+' failed ' + JSON.stringify( join, null, '  ' ) );
+
+	join = await SQL.query( 'join_users js' )
+		.join( await SQL.query( 'join_address' ).where( 'active = 1' ).get_all_query( 'id, active, city', null, 'ja' ), 'js.id = ja.id' )
+		.where( 'js.id <= 3' )
+		.get_all('js.*, ja.*');
+	assert.deepEqual( join.rows, [ { id: 1, name: 'John', active: 1, city: 'City' },
+	{ id: 2, name: 'Max', active: 1, city: 'New' },
+	{ id: 3, name: 'George G', active: 1, city: 'Old' } ], 'Test join '+(++cnt)+' failed ' + JSON.stringify( join, null, '  ' ) );
 
 }).timeout(100000);

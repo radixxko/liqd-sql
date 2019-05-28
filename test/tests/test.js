@@ -3,7 +3,9 @@
 const assert = require('assert');
 const TimedPromise = require('liqd-timed-promise');
 let SQL = new (require('../../lib/sql.js'))( config );
+let tables = require('./../all_tables.js');
 
+let test;
 SQL.on( 'query', (query) =>
 {
 });
@@ -29,19 +31,30 @@ it( 'Create', async() =>
 	await SQL.query( 'join_users').drop_table( true );
 	await SQL.query( 'join_address').drop_table( true );
 
-	let join_users = await SQL.query( config.tables['join_users'], 'join_users' ).create_table( true );
-	let join_address = await SQL.query( config.tables['join_address'], 'join_address' ).create_table( true );
+	let join_users = await SQL.query( tables['join_users'], 'join_users' ).create_table( true );
+	let join_address = await SQL.query( tables['join_address'], 'join_address' ).create_table( true );
 
 	await SQL.query( 'join_users' ).insert( [ { id: 1, name: 'John' }, { id: 2, name: 'Max' }, { id: 3, name: 'George G' }, { id: 4, name: 'Janet J' }, { id: 5, name: 'Kate K' } ] );
 	await SQL.query( 'join_address' ).insert( [ { id: 1, city: 'City' }, { id: 2, city: 'New' }, { id: 3, city: 'Old' } ] );
 }).timeout(100000);
 
+it( 'Escape', async() =>
+{
+	let test, cnt = 0;
+
+	test = await SQL.query( 'test' ).escape_value();
+	assert.ok( test && typeof test === 'string', 'Escape '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
+
+	test = await SQL.query( 'test' ).escape_column();
+	assert.ok( test && typeof test === 'string', 'Escape '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
+
+}).timeout(100000);
 it( 'GROUP BY', async() =>
 {
 	let interval = 360000;
 
-	let cnt = 0;
-	let test = await SQL.query( 'join_users js' )
+	let cnt = 0, expected_string;
+	test = await SQL.query( 'join_users js' )
 		.inner_join( 'join_address', 'js.id = join_address.id AND join_address.active = 1' )
 		.inner_join( 'join_address jas', 'js.id = jas.id AND jas.active = 1' )
 		.group_by( 'js.name' )
@@ -52,15 +65,44 @@ it( 'GROUP BY', async() =>
 	let part = 'adadd ( start DIV OR :? ) * status date';
 	let alias = part.match(/\s+([\w]+)$/g);
 
-	let expected_string = "SELECT COUNT( DISTINCT `label` ) `cnt`,  ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > 0,  1,  2 ),  MAX(`status`) `status` FROM `set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC";
+	expected_string = {
+		mysql : "SELECT COUNT( DISTINCT `label` ) `cnt`,  ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > 0,  1,  2 ) `position`,  MAX(`status`) `status` FROM `set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC",
+		oracle : 'SELECT COUNT( DISTINCT "label" ) "cnt",  ( MAX("start") DIV 360000 ) * MAX("status") "date",  MAX("start") + MAX("start") "alias", ( CASE WHEN ( MAX("start") * MAX("end") ) > 0 THEN 1 ELSE 2 END ) "position",  MAX("status") "status" FROM "set_address" WHERE "label" = \'AAAA\' AND "start" >= 10000 GROUP BY "start" DIV 360000 , "status" ORDER BY "start" DIV 360000 ASC',
+		mysql_db : "SELECT COUNT( DISTINCT `label` ) `cnt`,  ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > 0,  1,  2 ) `position`,  MAX(`status`) `status` FROM `test_1`.`set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC",
+		oracle_db : 'SELECT COUNT( DISTINCT "label" ) "cnt",  ( MAX("start") DIV 360000 ) * MAX("status") "date",  MAX("start") + MAX("start") "alias", ( CASE WHEN ( MAX("start") * MAX("end") ) > 0 THEN 1 ELSE 2 END ) "position",  MAX("status") "status" FROM "test_1"."set_address" WHERE "label" = \'AAAA\' AND "start" >= 10000 GROUP BY "start" DIV 360000 , "status" ORDER BY "start" DIV 360000 ASC',
+	};
+
 	test = await SQL.query( 'set_address')
 		.where('label = :label AND start >= :start', { label: 'AAAA', start: 10000 })
 		.group_by('start DIV :? , status', interval)
 		.order_by('start DIV :? ASC', interval)
-		.get_all_query('COUNT( DISTINCT label ) cnt, ( start DIV :? ) * status date, start + start alias, IF( ( start * end ) > 0, 1, 2 ), status', interval );
+		.get_all_query('COUNT( DISTINCT label ) cnt, ( start DIV :? ) * status date, start + start alias, IF( ( start * end ) > 0, 1, 2 ) position, status', interval );
 
-	test = test.replace(/"/g,'`').replace(/(IIF)/g,'IF');
-	assert.equal( test.replace(/\s+/g,' ') , expected_string.replace(/\s+/g,' '), 'GROUP BY '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
+	assert.equal( test , expected_string[ config.connector + ( config.database ? '_db' : '' ) ], 'GROUP BY '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
+
+	expected_string = {
+		mysql : "SELECT COUNT( DISTINCT `label` ) `cnt`,  ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > ( 0 + 1 ),  1,  2 ) `position`,  MAX(`status`) `status` FROM `set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC",
+		oracle : 'SELECT COUNT( DISTINCT "label" ) "cnt",  ( MAX("start") DIV 360000 ) * MAX("status") "date",  MAX("start") + MAX("start") "alias", ( CASE WHEN ( MAX("start") * MAX("end") ) > ( 0 + 1 )  THEN 1 ELSE 2 END ) "position",  MAX("status") "status" FROM "set_address" WHERE "label" = \'AAAA\' AND "start" >= 10000 GROUP BY "start" DIV 360000 , "status" ORDER BY "start" DIV 360000 ASC',
+		mysql_db : "SELECT COUNT( DISTINCT `label` ) `cnt`,  ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > ( 0 + 1 ),  1,  2 ) `position`,  MAX(`status`) `status` FROM `test_1`.`set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC",
+		oracle_db : 'SELECT COUNT( DISTINCT "label" ) "cnt",  ( MAX("start") DIV 360000 ) * MAX("status") "date",  MAX("start") + MAX("start") "alias", ( CASE WHEN ( MAX("start") * MAX("end") ) > ( 0 + 1 )  THEN 1 ELSE 2 END ) "position",  MAX("status") "status" FROM "test_1"."set_address" WHERE "label" = \'AAAA\' AND "start" >= 10000 GROUP BY "start" DIV 360000 , "status" ORDER BY "start" DIV 360000 ASC',
+};
+
+	test = await SQL.query( 'set_address')
+		.where('label = :label AND start >= :start', { label: 'AAAA', start: 10000 })
+		.group_by('start DIV :? , status', interval)
+		.order_by('start DIV :? ASC', interval)
+		.get_all_query('COUNT( DISTINCT label ) cnt, ( start DIV :? ) * status date, start + start alias, IF( ( start * end ) > ( 0 + 1 ), 1, 2 ) position, status', interval );
+
+	assert.equal( test , expected_string[ config.connector + ( config.database ? '_db' : '' ) ], 'GROUP BY '+ (++cnt) +' failed ' + JSON.stringify( test, null, '  ' ) );
+
+	/**/
+	expected_string = "SELECT COUNT( DISTINCT `label` ) `cnt`, GROUP_CONCAT( `label` ORDER BY `start` ASC SEPARATOR ) ordered_concat, ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > 0,  1,  2 ),  MAX(`status`) `status` FROM `set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC";
+	test = await SQL.query( 'set_address')
+		.where('label = :label AND start >= :start', { label: 'AAAA', start: 10000 })
+		.group_by('start DIV :? , status', interval)
+		.order_by('start DIV :? ASC', interval)
+		.get_all_query('COUNT( DISTINCT label ) cnt, GROUP_CONCAT( label ORDER BY start ASC SEPARATOR :separator ) ordered_concat, ( start DIV :interval ) * status date, start + start alias, IF( ( start * end ) > 0, 1, 2 ), status', { interval, separator: ',' } );
+	/**/
 
 	expected_string = "SELECT COUNT( DISTINCT `street`, `city` ) `cnt`,  ( MAX(`start`) DIV 360000 ) * MAX(`status`) `date`,  MAX(`start`) + MAX(`start`) `alias`,  IF( ( MAX(`start`) * MAX(`end`) ) > 0,  1,  2 ),  MAX(`status`) `status` FROM `set_address` WHERE `label` = 'AAAA' AND `start` >= 10000 GROUP BY `start` DIV 360000 , `status` ORDER BY `start` DIV 360000 ASC";
 	test = await SQL.query( 'set_address')
@@ -100,7 +142,7 @@ it( 'GROUP BY', async() =>
 it( 'Create', async() =>
 {
 	await SQL.query('test_users').drop_table( true );
-	let test_users = await SQL.query( config.tables['test_users'], 'test_users' ).create_table( true );
+	let test_users = await SQL.query( tables['test_users'], 'test_users' ).create_table( true );
 	await SQL.query( 'test_users' ).insert( [ { name: 'John' }, { name: 'Max' }, { name: 'George' }, { name: 'Janet' }, { name: 'Janet' }, { name: 'Max' }, { name: 'Janet' } ] );
 
 }).timeout(100000);
@@ -172,7 +214,7 @@ it( 'Where as object', async() =>
 	select = await SQL.query( 'test_users' ).where( { '!name': ['Max', 'Janet' ], surname: null }  ).get_all('name');
 	assert.deepEqual( select.rows, [{ name: 'John' },{ name: 'George' }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
 
-	select = await SQL.query( 'test_users' ).where( { 'name': ['George', 'Max' ], surname: null }  ).group_by('name').get_all('name');
+	select = await SQL.query( 'test_users' ).where( { 'name': ['George', 'Max' ], surname: null }  ).order_by('name ASC').group_by('name').get_all('name');
 	assert.deepEqual( select.rows, [{ name: 'George' },{ name: 'Max' }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
 
 	select = await SQL.query( 'test_users' ).where( { '!name': null }  ).group_by('name').order_by('name ASC').get_all('name');
@@ -188,6 +230,10 @@ it( 'CONCAT', async() =>
 
 	select = await SQL.query( 'join_users').where('( id = 1 AND CONCAT( id , :separator, name ) = :string )', { string: '1_John', separator : '_'  }).get('id, CONCAT( id , :separator, name ) alias, CONCAT( id , :separator, name ) alias2', { separator: '_' } );
 	assert.deepEqual( select.rows, [{ id: 1, alias: '1_John', alias2: '1_John' }] , 'CONCAT '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
+
+	select = await SQL.query( 'join_users').group_by('join_users.id').where('( join_users.id = 1 AND CONCAT( join_users.id , :separator, join_users.name ) = :string )', { string: '1 John', separator : ' '  }).get('join_users.id, CONCAT( join_users.id , :separator, join_users.name ) alias, CONCAT( join_users.id , :separator, join_users.name ) alias2', { separator: ' ' } );
+
+	assert.deepEqual( select.rows, [{ id: 1, alias: '1 John', alias2: '1 John' }] , 'CONCAT '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
 
 }).timeout(100000);
 

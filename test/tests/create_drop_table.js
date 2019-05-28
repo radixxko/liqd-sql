@@ -7,12 +7,12 @@ let insert, select, delete_row;
 
 it( 'Create', async() =>
 {
-	await SQL.query( config.tables['create_user'] , 'create_user' ).create_table( true );
+	await SQL.query( config.all_tables['create_user'] , 'create_user' ).create_table( true );
 
 	let check = await SQL.query( 'create_user' ).insert( {  name: 'John' } );
 	assert.ok( check.ok && check.affected_rows === 1, 'Create failed 1' + JSON.stringify( check, null, '	' ));
 
-	await SQL.query( await SQL.query( config.tables['create_user_2'] , 'create_user_2' ).create_table() ).execute();
+	await SQL.query( await SQL.query( config.all_tables['create_user_2'] , 'create_user_2' ).create_table() ).execute();
 	check = await SQL.query( 'create_user_2' ).insert( { name: 'John' } );
 	assert.ok( check.ok && check.affected_rows === 1, 'Create failed 2' + JSON.stringify( check, null, '	' ));
 }).timeout(100000);

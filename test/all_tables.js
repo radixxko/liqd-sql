@@ -1,5 +1,146 @@
 module.exports =
 {
+	primary_string :
+	{
+		columns :
+		{
+			id: { type: 'VARCHAR:255' },
+			name: { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
+	primary_number :
+	{
+		columns :
+		{
+			id: { type: 'BIGINT:20' },
+			name: { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
+	selected :
+	{
+		columns :
+		{
+			id: { type: 'VARCHAR:255' },
+			name: { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
+	selected2 :
+	{
+		columns :
+		{
+			id: { type: 'VARCHAR:255' },
+			name: { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
+	selected3 :
+	{
+		columns :
+		{
+			id: { type: 'BIGINT' },
+			name: { type: 'VARCHAR:255' },
+			data: { type: 'TEXT' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
+	table_one :
+	{
+		columns :
+		{
+			id: { type: 'VARCHAR:255' },
+			name: { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
+	table_two :
+	{
+		columns :
+		{
+			id: { type: 'VARCHAR:255' },
+			name: { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
+	truncate :
+	{
+		columns :
+		{
+			id       : { type: 'BIGINT:UNSIGNED', increment: true },
+			position : { type: 'BIGINT:UNSIGNED' },
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
+	reserved :
+	{
+		columns :
+		{
+			id       : { type: 'BIGINT:UNSIGNED', increment: true },
+			group    : { type: 'BIGINT:UNSIGNED' },
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
+	collate :
+	{
+		columns :
+		{
+			id    : { type: 'BIGINT:UNSIGNED', increment: true },
+			value : { type: 'VARCHAR:255' },
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
 	create_user :
 	{
 		columns :
@@ -55,50 +196,6 @@ module.exports =
 			primary : 'id',
 			unique  : [],
 			index   : []
-		}
-	},
-	insert_users :
-	{
-		columns :
-		{
-			id          : { type: 'BIGINT:UNSIGNED', increment: true },
-			name        : { type: 'VARCHAR:255' },
-			description : { type: 'TEXT', null: true },
-			created     : { type: 'TIMESTAMP', default: 'CURRENT_TIMESTAMP', update: 'CURRENT_TIMESTAMP' },
-			surname     : { type: 'VARCHAR:55', null: true }
-		},
-		indexes :
-		{
-			primary : 'id',
-			unique  : ['name'],
-			index   : 'surname'
-		}
-	},
-	insert_users_2 :
-	{
-		columns :
-		{
-			id      : { type: 'BIGINT:UNSIGNED' },
-			name    : { type: 'VARCHAR:255' },
-			surname : { type: 'VARCHAR:255' }
-		},
-		indexes :
-		{
-			primary : 'id,name',
-			unique  : []
-		}
-	},
-	insert_users_3 :
-	{
-		columns :
-		{
-			id      : { type: 'BIGINT:UNSIGNED' },
-			name    : { type: 'VARCHAR:255' }
-		},
-		indexes :
-		{
-			primary : 'id',
-			unique  : []
 		}
 	},
 	join_users :
@@ -340,18 +437,19 @@ module.exports =
 			index   : []
 		}
 	},
-	update_users_3 :
+	update_users_4 :
 	{
 		columns :
 		{
-			name    : { type: 'VARCHAR:255' },
-			surname : { type: 'VARCHAR:255' },
-			city 	: { type: 'VARCHAR:255' }
+			id    : { type: 'BIGINT:UNSIGNED' },
+			groups : { type: 'BIGINT:UNSIGNED' },
+			uid   : { type: 'BIGINT:UNSIGNED' },
+			name  : { type: 'VARCHAR:255' }
 		},
 		indexes :
 		{
-			primary : '',
-			unique  : [ 'name,surname' ],
+			primary : 'id',
+			unique  : [ 'groups,uid' ],
 			index   : []
 		}
 	},
@@ -365,6 +463,108 @@ module.exports =
 		indexes : {
 			primary : 'id',
 			unique  : [],
+			index   : []
+		}
+	},
+	set_string :
+	{
+		columns :
+		{
+			id : { type: 'BIGINT:UNSIGNED', increment: true },
+			uid : { type: 'BIGINT:UNSIGNED' },
+			string1: { type: 'VARCHAR:255' },
+			string2: { type: 'VARCHAR:255' },
+			string3: { type: 'VARCHAR:255' },
+			string4: { type: 'VARCHAR:12' },
+			string5: { type: 'TEXT' },
+			string6: { type: 'TEXT' },
+			string7: { type: 'SET:first,second,third' },
+			string8: { type: 'ENUM:north,west,south,east' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [ 'uid' ],
+			index   : []
+		}
+	},
+	insert_string :
+	{
+		columns :
+		{
+			id : { type: 'BIGINT:UNSIGNED', increment: true },
+			string1: { type: 'VARCHAR:255' },
+			string2: { type: 'VARCHAR:255' },
+			string3: { type: 'VARCHAR:255' },
+			string4: { type: 'VARCHAR:12' },
+			string5: { type: 'TEXT' },
+			string6: { type: 'TEXT' },
+			string7: { type: 'SET:first,second,third' },
+			string8: { type: 'ENUM:north,west,south,east' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
+	insert_users :
+	{
+		columns :
+		{
+			id          : { type: 'BIGINT:UNSIGNED', increment: true },
+			name        : { type: 'VARCHAR:255' },
+			description : { type: 'TEXT', null: true },
+			created     : { type: 'TIMESTAMP', default: 'CURRENT_TIMESTAMP', update: 'CURRENT_TIMESTAMP' },
+			surname     : { type: 'VARCHAR:55', null: true }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : ['name'],
+			index   : 'surname'
+		}
+	},
+	insert_users_2 :
+	{
+		columns :
+		{
+			id      : { type: 'BIGINT:UNSIGNED' },
+			name    : { type: 'VARCHAR:255' },
+			surname : { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : 'id,name',
+			unique  : []
+		}
+	},
+	insert_users_3 :
+	{
+		columns :
+		{
+			id      : { type: 'BIGINT:UNSIGNED' },
+			name    : { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : []
+		}
+	},
+	update_users_3 :
+	{
+		columns :
+		{
+			name    : { type: 'VARCHAR:255' },
+			surname : { type: 'VARCHAR:255' },
+			city 	: { type: 'VARCHAR:255' }
+		},
+		indexes :
+		{
+			primary : '',
+			unique  : [ 'name,surname' ],
 			index   : []
 		}
 	}
