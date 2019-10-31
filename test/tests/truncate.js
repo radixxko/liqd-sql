@@ -16,11 +16,32 @@ it( 'Truncate', async() =>
 
 	let cnt = 0;
 	let inserted = await SQL.query( 'truncate' ).get_all();
-	assert.ok( inserted.ok && inserted.rows.length === 10, 'Insert for truncate'+ (++cnt) +' failed' + JSON.stringify( inserted, null, '  ' ) );
+	assert.ok( inserted.ok && inserted.rows.length === 10, 'Insert for truncated table '+ (++cnt) +' failed' + JSON.stringify( inserted, null, '  ' ) );
 
 	await SQL.query('truncate').truncate();
 
 	inserted = await SQL.query( 'truncate' ).get_all();
-	assert.ok( inserted.ok && inserted.rows.length === 0, 'Insert for truncate'+ (++cnt) +' failed' + JSON.stringify( inserted, null, '  ' ) );
+	assert.ok( inserted.ok && inserted.rows.length === 0, 'Insert for truncated table '+ (++cnt) +' failed' + JSON.stringify( inserted, null, '  ' ) );
 
+}).timeout(100000);
+
+it( 'Truncate', async() =>
+{
+	let cnt = 0;
+
+	await SQL.table('truncate').drop();
+	await SQL.table( config.all_tables['truncate'], 'truncate' ).create();
+
+	for( let i = 1; i < 11; i++ )
+	{
+		await SQL.query( 'truncate' ).insert( { position: i } );
+	}
+
+	let inserted = await SQL.query( 'truncate' ).get_all();
+	assert.ok( inserted.ok && inserted.rows.length === 10, 'Insert for truncated table '+ (++cnt) +' failed' + JSON.stringify( inserted, null, '  ' ) );
+
+	await SQL.table('truncate').truncate();
+
+	inserted = await SQL.query( 'truncate' ).get_all();
+	assert.ok( inserted.ok && inserted.rows.length === 0, 'Insert for truncated table '+ (++cnt) +' failed' + JSON.stringify( inserted, null, '  ' ) );
 }).timeout(100000);

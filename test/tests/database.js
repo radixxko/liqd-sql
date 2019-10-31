@@ -20,6 +20,14 @@ let defaultRows = {
 	]
 };
 
+it( 'Schema', async() =>
+{
+	let cnt = 0, schema;
+
+	schema = await SQL.database().schema();
+	assert.ok( schema.ok, 'Test error '+( ++cnt )+' failed '+ '. Database schema failed' + JSON.stringify( schema, null, '  ' ) );
+}).timeout(100000);
+
 it( 'Create', async() =>
 {
 	let cnt = 0, database = 'test_1', test;
@@ -34,10 +42,10 @@ it( 'Create', async() =>
 	assert.ok( !test.ok , 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
 	test = await SQL.query().create_database( database, config.tables, { result_type: 'arrays' } );
-	assert.ok( !test.ok , 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+	assert.ok( test.ok && typeof test.create === 'string', 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
 	test = await SQL.query().create_database( database, config.tables, { result_type: 'array', drop_table: true, default_rows: [ { table: '' } ] } );
-	assert.ok( !test.ok , 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+	assert.ok( test.ok , 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
 	test = await SQL.query().create_database( database, config.tables, { result_type: 'array', default_rows: defaultRows } );
 	assert.ok( test.create && test.create.length === 39, 'Test error '+( ++cnt )+' failed '+ '. Database '+ Object.keys( config.tables ).length + 1 +' length. Created length '+ test.create.length + '. ' + JSON.stringify( test, null, '  ' ) );
@@ -45,9 +53,29 @@ it( 'Create', async() =>
 	test = await SQL.query().create_database( database, config.tables, { drop_table: true } );
 	assert.ok( test.ok && test.create && typeof test.create === 'string' , 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
+	test = await SQL.database( database ).create_query( config.tables, { result_type: 'array' } );
+	assert.ok( test.ok && test.create && Array.isArray( test.create ), 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+
+	test = await SQL.database( database ).create_query( config.tables );
+	assert.ok( test.ok && test.create && typeof test.create === 'string', 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+
+	test = await SQL.database( database ).create( config.tables );
+	assert.ok( test.ok , 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+
 	//test = await SQL.query().create_database( database, config.tables, { result_type: 'execute', drop_table: true } );
 	//assert.ok( test.ok && test.create && typeof test.create === 'string' , 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
+}).timeout(100000);
+
+it( 'Drop', async() =>
+{
+	let cnt = 0, database = 'test_1', test;
+
+	test = await SQL.database( database ).drop_query();
+	assert.ok( test.ok , 'Test drop database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
+
+	test = await SQL.database( database ).drop();
+	assert.ok( test.ok , 'Test drop database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 }).timeout(100000);
 
 

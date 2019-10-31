@@ -211,7 +211,7 @@ it( 'Where as object', async() =>
 	let select = await SQL.query( 'join_users' ).where( { name: 'John' }  ).group_by('name').get_all('name, COUNT(*) count');
 	assert.deepEqual( select.rows, [{ name: 'John', count: 1 }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
 
-	select = await SQL.query( 'test_users' ).where( { '!name': ['Max', 'Janet' ], surname: null }  ).get_all('name');
+	select = await SQL.query( 'test_users' ).where( { '!name': ['Max', 'Janet' ], surname: null }  ).order_by('name DESC').get_all('name');
 	assert.deepEqual( select.rows, [{ name: 'John' },{ name: 'George' }] , 'Select '+ (++cnt) +' failed ' + JSON.stringify( select, null, '  ' ) );
 
 	select = await SQL.query( 'test_users' ).where( { 'name': ['George', 'Max' ], surname: null }  ).order_by('name ASC').group_by('name').get_all('name');

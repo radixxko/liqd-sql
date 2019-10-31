@@ -17,11 +17,22 @@ global.config = {
 	connector : 'mysql',
 	compare_objects: async function( origin, comparison, cnt, query, name = '' )
 	{
-		assert.ok( Object.values( origin ).length === Object.values( comparison ).length, 'Check compare_objects '+ cnt +' failed ' + JSON.stringify( { origin, comparison }, null, '  ' ) );
+		assert.ok( ( !origin && !comparison ) || ( Object.values( origin ).length === Object.values( comparison ).length ), 'Check compare_objects '+ cnt +' failed ' + JSON.stringify( { origin, comparison }, null, '  ' ) );
 
 		for( let col_name in origin )
 		{
-			assert.ok( comparison.hasOwnProperty( col_name ) && ( ( comparison[ col_name ] && origin[ col_name ] === comparison[ col_name ] ) || ( ( !origin[ col_name ] || !comparison[ col_name ] ) && [null,''].includes(comparison[ col_name ]) && [null,''].includes(origin[ col_name ]) )), 'Compare object for '+ name + ' ' + cnt +' failed ' + JSON.stringify( {  origin, comparison }, null, '  ' ) );
+			if( typeof origin[ col_name ] === 'object' )
+			{
+				await config.compare_objects( origin[ col_name ], origin[ col_name ], cnt, query, name );
+			}
+			else if( Array.isArray( origin[ col_name ]))
+			{
+				await config.compare_array( origin[ col_name ], origin[ col_name ], cnt, query, name );
+			}
+			else
+			{
+				assert.ok( comparison.hasOwnProperty( col_name ) && ( ( comparison[ col_name ] && origin[ col_name ] === comparison[ col_name ] ) || ( ( !origin[ col_name ] || !comparison[ col_name ] ) && [null,''].includes(comparison[ col_name ]) && [null,''].includes(origin[ col_name ]) )), 'Compare object for '+ name + ' ' + cnt +' failed ' + JSON.stringify( {  origin, comparison }, null, '  ' ) );
+			}
 		}
 	},
 	compare_array: async function( origin, comparison, cnt, query, name = '' )
@@ -33,6 +44,14 @@ global.config = {
 			if( typeof origin[i] === 'object' )
 			{
 				await config.compare_objects( origin[i], comparison[i], cnt, query, name );
+			}
+			else if( Array.isArray( origin[i] ))
+			{
+				await config.compare_objects( origin[i], comparison[i], cnt, query, name );
+			}
+			else
+			{
+				assert.ok( origin[i] && comparison[i] && ( ( comparison[i] && origin[i] === comparison[i] ) || ( ( !origin[i] || !comparison[i] ) && [null,''].includes(comparison[i]) && [null,''].includes(origin[i]) )), 'Compare object for '+ name + ' ' + cnt +' failed ' + JSON.stringify( {  origin, comparison }, null, '  ' ) );
 			}
 		}
 	}
