@@ -20,14 +20,6 @@ let defaultRows = {
 	]
 };
 
-it( 'Schema', async() =>
-{
-	let cnt = 0, schema;
-
-	schema = await SQL.database().schema();
-	assert.ok( schema.ok, 'Test error '+( ++cnt )+' failed '+ '. Database schema failed' + JSON.stringify( schema, null, '  ' ) );
-}).timeout(100000);
-
 it( 'Create', async() =>
 {
 	let cnt = 0, database = 'test_1', test;
@@ -65,6 +57,14 @@ it( 'Create', async() =>
 	//test = await SQL.query().create_database( database, config.tables, { result_type: 'execute', drop_table: true } );
 	//assert.ok( test.ok && test.create && typeof test.create === 'string' , 'Test create_database '+( ++cnt )+' failed ' + JSON.stringify( test, null, '  ' ) );
 
+}).timeout(100000);
+
+it( 'Schema', async() =>
+{
+	let cnt = 0, schema;
+
+	schema = await SQL.database( 'test_1' ).schema();
+	assert.ok( schema.ok, 'Test error '+( ++cnt )+' failed '+ '. Database schema failed' + JSON.stringify( schema, null, '  ' ) );
 }).timeout(100000);
 
 it( 'Drop', async() =>
