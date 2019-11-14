@@ -31,7 +31,7 @@ global.config = {
 			}
 			else
 			{
-				assert.ok( comparison.hasOwnProperty( col_name ) && ( ( comparison[ col_name ] && origin[ col_name ] === comparison[ col_name ] ) || ( ( !origin[ col_name ] || !comparison[ col_name ] ) && [null,''].includes(comparison[ col_name ]) && [null,''].includes(origin[ col_name ]) )), 'Compare object for '+ name + ' ' + cnt +' failed ' + JSON.stringify( {  origin, comparison }, null, '  ' ) );
+				assert.ok( comparison.hasOwnProperty( col_name ) && ( ( origin[ col_name ] === comparison[ col_name ] ) || ( ( !origin[ col_name ] || !comparison[ col_name ] ) && [null,''].includes(comparison[ col_name ]) && [null,''].includes(origin[ col_name ]) )), 'Compare object for '+ name + ' ' + cnt +' failed ' + JSON.stringify( {  origin, comparison }, null, '  ' ) );
 			}
 		}
 	},

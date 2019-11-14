@@ -198,6 +198,24 @@ module.exports =
 			index   : []
 		}
 	},
+	preset :
+	{
+		columns :
+		{
+			id   : { type: 'BIGINT:UNSIGNED' },
+			name : { type: 'VARCHAR:32' },
+			surname : { type: 'VARCHAR:32', default: '' },
+			description : { type: 'VARCHAR:255', default: '' },
+			age : { type: 'INT:UNSIGNED', default: 'NULL', null: true },
+			number : { type: 'INT:UNSIGNED', default: 0 }
+		},
+		indexes :
+		{
+			primary : 'id',
+			unique  : [],
+			index   : []
+		}
+	},
 	join_users :
 	{
 		columns :
